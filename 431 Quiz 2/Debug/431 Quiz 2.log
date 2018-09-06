@@ -1,0 +1,4 @@
+﻿  main.cpp
+c:\users\chris\source\repos\431 quiz 2\431 quiz 2\mesh.h(392): warning C4018: '<': signed/unsigned mismatch
+c:\users\chris\source\repos\431 quiz 2\431 quiz 2\mesh.h(419): warning C4018: '<': signed/unsigned mismatch
+  431 Quiz 2.vcxproj -> C:\Users\Chris\source\repos\431 Quiz 2\Debug\431 Quiz 2.exe
