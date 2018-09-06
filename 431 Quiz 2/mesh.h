@@ -432,23 +432,8 @@ void calculateNormalPerVertex(Mesh* m) {
 
 
 //creates 3d terrain based on a randomly generated heightmap, currently has no texture info
-Mesh* createTerrain(int precision) {
-	ImprovedNoise* noise = new ImprovedNoise();
-	double** points;
+Mesh* createTerrain(int precision, double** points) {
 	Mesh *mesh = new Mesh;
-
-	//creates 2d heightmap using multiscale noise
-	points = new double*[precision];
-	for (int i = 0; i < precision; i++) {
-		points[i] = new double[precision];
-	}
-
-	//create polygons from heightmap
-	for (int i = 0; i < precision; i++) {
-		for (int j = 0; j < precision; j++) {
-			points[i][j] = noise->perlinMultiscale(i, j);
-		}
-	}
 
 	for (int i = 0; i < precision; i++) {
 		for (int j = 0; j < precision; j++) {

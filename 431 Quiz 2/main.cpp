@@ -11,6 +11,8 @@
 #include "render.h"
 #include "controls.h"
 
+#define terrainSamples 100
+
 // global
 Mesh *floorPlane, *cube1, *cube2, *cube3, *skybox, *mountains;
 GLuint display1, display2, display3, display4, display5, display6;
@@ -24,7 +26,26 @@ void init() {
 	cube2 = createCube();
 	cube3 = createCube();
 	skybox = createSkyBox(6000);
-	mountains = createTerrain(100);
+
+
+	ImprovedNoise* noise = new ImprovedNoise();
+
+	//initializes array for heightmap
+	double** points = new double*[terrainSamples];
+	for (int i = 0; i < terrainSamples; i++) {
+		points[i] = new double[terrainSamples];
+		for(int j = 0; j < terrainSamples; j++) {
+			points[i][j] = 0;
+		}
+	}
+
+	//fills heightmap with random values
+	for (int i = 0; i < terrainSamples; i++) {
+		for (int j = 0; j < terrainSamples; j++) {
+			points[i][j] = noise->perlinMultiscale(i, j);
+		}
+	}
+	mountains = createTerrain(100, points);
 	
 	// normals
 	calculateNormalPerFace(floorPlane);
