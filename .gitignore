@@ -5,3 +5,4 @@
 *.tlog
 *.obj
 .vs/
+.vcxproj
