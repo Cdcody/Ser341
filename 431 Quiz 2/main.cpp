@@ -366,6 +366,10 @@ void mySpecial(int key, int x, int y) {
 
 	case GLUT_KEY_LEFT:
 
+	 Testing testing
+	 testing 
+	 123123
+
 		cameraAngle -= 0.04f;
 
 		orientMe(cameraAngle);
