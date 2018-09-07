@@ -455,6 +455,25 @@ Mesh* createTerrain(int precision, double** points) {
 		}
 	}
 
+	for (int i = 0; i < precision - 1; i++) {
+		for (int j = 0; j < precision - 1; j++) {
+			//texture
+			mesh->dot_texture.push_back(Vec2<GLfloat>(0.0, 0.0));
+			mesh->dot_texture.push_back(Vec2<GLfloat>(0.0, 1.0));
+			mesh->dot_texture.push_back(Vec2<GLfloat>(1.0, 0.0));
+			mesh->dot_texture.push_back(Vec2<GLfloat>(1.0, 1.0));
+			// index for texture
+			for (int t = 0; t < 6; t++) {
+				mesh->face_index_texture.push_back(3);//0
+				mesh->face_index_texture.push_back(2);//2
+				mesh->face_index_texture.push_back(1);//1
+				mesh->face_index_texture.push_back(2);//0
+				mesh->face_index_texture.push_back(0);//3
+				mesh->face_index_texture.push_back(1);//2
+			}
+		}
+	}
+
 
 	
 	//cleanup arrays
