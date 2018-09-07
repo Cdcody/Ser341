@@ -72,23 +72,23 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Users\Chris\source\repos\Skybox\Skybox\Dependencies\include;C:\Users\Chris\source\repos\Skybox\Skybox\Dependencies\IlmBase\inc\IlmThread;C:\Users\Chris\source\repos\Skybox\Skybox\Dependencies\IlmBase\inc\Imath;C:\Users\Chris\source\repos\Skybox\Skybox\Dependencies\IlmBase\inc\Half;C:\Users\Chris\source\repos\Skybox\Skybox\Dependencies\IlmBase\inc\Iex;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\Chris\source\repos\Skybox\Skybox\Dependencies\lib;C:\Users\Chris\source\repos\Skybox\Skybox\Dependencies\IlmBase\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\include;C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\IlmBase\IlmBase\inc\IlmThread;C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\IlmBase\IlmBase\inc\Imath;C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\IlmBase\IlmBase\inc\Half;C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\IlmBase\IlmBase\inc\Iex;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\lib;C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\IlmBase\IlmBase\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Users\Chris\source\repos\Skybox\Skybox\Dependencies\include;C:\Users\Chris\source\repos\Skybox\Skybox\Dependencies\IlmBase\inc\IlmThread;C:\Users\Chris\source\repos\Skybox\Skybox\Dependencies\IlmBase\inc\Imath;C:\Users\Chris\source\repos\Skybox\Skybox\Dependencies\IlmBase\inc\Half;C:\Users\Chris\source\repos\Skybox\Skybox\Dependencies\IlmBase\inc\Iex;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\Chris\source\repos\Skybox\Skybox\Dependencies\lib;C:\Users\Chris\source\repos\Skybox\Skybox\Dependencies\IlmBase\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\include;C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\IlmBase\IlmBase\inc\IlmThread;C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\IlmBase\IlmBase\inc\Imath;C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\IlmBase\IlmBase\inc\Half;C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\IlmBase\IlmBase\inc\Iex;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\lib;C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\IlmBase\IlmBase\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Users\Chris\source\repos\Skybox\Skybox\Dependencies\include;C:\Users\Chris\source\repos\Skybox\Skybox\Dependencies\IlmBase\inc\IlmThread;C:\Users\Chris\source\repos\Skybox\Skybox\Dependencies\IlmBase\inc\Imath;C:\Users\Chris\source\repos\Skybox\Skybox\Dependencies\IlmBase\inc\Half;C:\Users\Chris\source\repos\Skybox\Skybox\Dependencies\IlmBase\inc\Iex;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\Chris\source\repos\Skybox\Skybox\Dependencies\lib;C:\Users\Chris\source\repos\Skybox\Skybox\Dependencies\IlmBase\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\include;C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\IlmBase\IlmBase\inc\IlmThread;C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\IlmBase\IlmBase\inc\Imath;C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\IlmBase\IlmBase\inc\Half;C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\IlmBase\IlmBase\inc\Iex;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\lib;C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\IlmBase\IlmBase\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Users\Chris\source\repos\Skybox\Skybox\Dependencies\include;C:\Users\Chris\source\repos\Skybox\Skybox\Dependencies\IlmBase\inc\IlmThread;C:\Users\Chris\source\repos\Skybox\Skybox\Dependencies\IlmBase\inc\Imath;C:\Users\Chris\source\repos\Skybox\Skybox\Dependencies\IlmBase\inc\Half;C:\Users\Chris\source\repos\Skybox\Skybox\Dependencies\IlmBase\inc\Iex;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\Chris\source\repos\Skybox\Skybox\Dependencies\lib;C:\Users\Chris\source\repos\Skybox\Skybox\Dependencies\IlmBase\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\include;C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\IlmBase\IlmBase\inc\IlmThread;C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\IlmBase\IlmBase\inc\Imath;C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\IlmBase\IlmBase\inc\Half;C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\IlmBase\IlmBase\inc\Iex;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\lib;C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\IlmBase\IlmBase\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
