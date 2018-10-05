@@ -234,8 +234,8 @@ void display(void) {
 	//mountains
 	glPushMatrix();
 	
-	glTranslatef(-12000, 0, -12000);
-	glScalef(300, 1000, 300);
+	glTranslatef(-12000, 300, -12000);
+	glScalef(300, 1200, 300);
 	glCallList(display6);
 	glPopMatrix();
 
@@ -284,11 +284,11 @@ void rotate_point(float angle) {
 void callbackKeyboard(unsigned char key, int x, int y) {
 	switch (key) {
 	case 'w': case 'W':
-		if(speed < 300)
+		if(speed < 200)
 		speed += (1);
 		break;
 	case 's': case 'S':
-		if (speed > -300)
+		if (speed > -200)
 		speed -= (1);
 		break;
 	case ' ':
@@ -343,6 +343,7 @@ void orientMe(float ang) {
 void moveMeFlat(int i) {
 
 	float newX = x + i * (lx)*0.5;
+	float newY = y + i * (ly)*0.5;
 	float newZ = z + i * (lz)*0.5;
 	//float newSkyX = skyX + i * (lx)*0.5;
 	//float newSkyZ = skyZ + i * (lz)*0.5;
@@ -350,6 +351,7 @@ void moveMeFlat(int i) {
 	//skyX = newSkyX;
 	//skyZ = newSkyZ;
 	x = newX;
+	y = newY;
 	z = newZ;
 }
 
