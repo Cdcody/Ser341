@@ -20,6 +20,20 @@ int turning = 0, o = 0;
 int FAST = 0;
 
 
+void defaultmat() {
+	GLfloat ambient[] = { .2, .2, .2, 1 };
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient);
+
+	GLfloat diffuse[] = { .8, .8, .8, 1 };
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse);
+
+	GLfloat specular[] = { 0, 0, 0, 1 };
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
+
+	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 0);
+}
+
+
 
 // menuListener
 void menuListener(int option) {
@@ -101,6 +115,7 @@ void init() {
 	codedTexture(textures, 3, 1); //Marble texture - noise marble. Type=1
 	loadBMP_custom(textures, "_BMP_files/cubesky.bmp", 4);
 	codedTexture(textures, 5, 2); //fire
+	loadBMP_custom(textures, "_BMP_files/grass.bmp", 6);
 
 
 	// display lists
@@ -109,7 +124,7 @@ void init() {
 	display3 = meshToDisplayList(cube2, 3, textures[2]);
 	display4 = meshToDisplayList(cube3, 4, textures[3]);
 	display5 = meshToDisplayList(skybox, 5, textures[4]);
-	display6 = meshToDisplayList(mountains, 6, textures[4]);
+	display6 = meshToDisplayList(mountains, 6, textures[6]);
 
 	// configuration
 	glShadeModel(GL_SMOOTH);
@@ -117,11 +132,13 @@ void init() {
 
 	// light
 	glEnable(GL_LIGHT0);
+	glEnable(GL_LIGHT1);
 	glEnable(GL_LIGHTING);
 	GLfloat light_ambient[] = { 0.5, 0.5, 0.5, 1.0 };
 	GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
 	GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
 	GLfloat light_position[] = { 0.0, 0.0, 1.0, 0.0 };
+	//GLfloat light_position[] = { 0.0, 0.0, 1.0, 0.0 };
 	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
@@ -191,18 +208,27 @@ void display(void) {
 	glCallList(display4);
 	glPopMatrix();
 	// end
+
+
 	// skybox
 	glPushMatrix();
-	glTranslatef(-2000, -1, -2000);
-	glScalef(1.5, 1.5, 1.5);
+	glTranslatef(-5500, -4200, -5500);
+	glScalef(2.0, 2.0, 2.0);
+	
+	glDisable(GL_LIGHT0);
+	GLfloat light_emissive2[] = { 1.0, 1.0, 1.0, 1.0 };
+	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, light_emissive2);
 	glCallList(display5);
 	glPopMatrix();
 
+	glEnable(GL_LIGHT0);
+	defaultmat();
+
 	//mountains
 	glPushMatrix();
-	glTranslatef(-200, 600, 0);
-	glScalef(10, 500, 10);
-
+	
+	glTranslatef(-200, 700, 0);
+	glScalef(80, 700, 80);
 	glCallList(display6);
 	glPopMatrix();
 
@@ -366,9 +392,6 @@ void mySpecial(int key, int x, int y) {
 
 	case GLUT_KEY_LEFT:
 
-	 Testing testing
-	 testing 
-	 123123
 
 		cameraAngle -= 0.04f;
 
