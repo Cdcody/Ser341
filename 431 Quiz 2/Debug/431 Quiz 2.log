@@ -1,6 +1,0 @@
-﻿  pch.cpp
-  main.cpp
-c:\users\justin vredevoogd\source\repos\ser341\431 quiz 2\mesh.h(392): warning C4018: '<': signed/unsigned mismatch
-c:\users\justin vredevoogd\source\repos\ser341\431 quiz 2\mesh.h(419): warning C4018: '<': signed/unsigned mismatch
-  LINK : C:\Users\Justin Vredevoogd\source\repos\Ser341\Debug\431 Quiz 2.exe not found or not built by the last incremental link; performing full link
-  431 Quiz 2.vcxproj -> C:\Users\Justin Vredevoogd\source\repos\Ser341\Debug\431 Quiz 2.exe
