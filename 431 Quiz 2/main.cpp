@@ -234,8 +234,8 @@ void display(void) {
 	//mountains
 	glPushMatrix();
 	
-	glTranslatef(-200, 700, 0);
-	glScalef(80, 700, 80);
+	glTranslatef(-12000, 0, -12000);
+	glScalef(300, 1000, 300);
 	glCallList(display6);
 	glPopMatrix();
 
@@ -254,7 +254,9 @@ void display(void) {
 	glLoadIdentity();
 	glColor3f(1.0, 1.0, 1.0);
 	renderBitmapString(0.0, window_height - 13.0f, 0.0f, "Use [Arrows] to move in plain");
-	renderBitmapString(0.0, window_height - 26.0f, 0.0f, "Use [W and S] to speed up or slow down");
+	renderBitmapString(0.0, window_height - 26.0f, 0.0f, "Hold [left mouse] and move to look around");
+	renderBitmapString(0.0, window_height - 39.0f, 0.0f, "Use [W and S] to speed up or slow down");
+	renderBitmapString(0.0, window_height - 52.0f, 0.0f, "Use [Spacebar] to stop");
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
 	glMatrixMode(GL_MODELVIEW);
