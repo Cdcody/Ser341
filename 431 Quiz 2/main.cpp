@@ -207,6 +207,12 @@ void display(void) {
 	glTranslatef(-200, 300, 0);
 	glCallList(display4);
 	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(-200, 300, -500);
+	AABB(cube3);
+	glPopMatrix();
+
 	// end
 
 
