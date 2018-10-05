@@ -216,11 +216,11 @@ void display(void) {
 
 	// end
 
-
+	//-9000, -8500, -9000
 	// skybox
 	glPushMatrix();
-	glTranslatef(GLfloat(skyX), -8500, GLfloat(skyZ));
-	glScalef(3.0, 3.0, 3.0);
+	glTranslatef(GLfloat(skyX), -17000, GLfloat(skyZ));
+	glScalef(6.0, 6.0, 6.0);
 	
 	glDisable(GL_LIGHT0);
 	GLfloat light_emissive2[] = { 1.0, 1.0, 1.0, 1.0 };
@@ -419,8 +419,8 @@ void mySpecial(int key, int x, int y) {
 //*/
 void myIdle() {
 
-	skyX = x - 9000;
-	skyZ = z - 9000;
+	skyX = x - 18000;
+	skyZ = z - 18000;
 	moveMeFlat(speed);
 
 	if (o == 10) {

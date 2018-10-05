@@ -22,8 +22,8 @@ float cameraAngle = 0;
 int width = 1200;
 int height = 600;
 int speed = 0;
-int skyX = -9000;
-int skyZ = -9000;
+int skyX = -18000;
+int skyZ = -18000;
 // camera
 //float camera_x = 0.0;
 //float camera_y = 300.0;
