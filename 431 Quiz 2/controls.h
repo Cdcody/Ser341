@@ -9,7 +9,7 @@
 #include <GL/glut.h>
 
 int window_width = 800, window_height = 800;
-const float window_ratio = 1.0;
+float window_ratio = 1.0;
 
 // controling parameters
 int mouse_button;

@@ -16,6 +16,7 @@
 Mesh *floorPlane, *cube1, *cube2, *cube3, *skybox, *mountains;
 GLuint display1, display2, display3, display4, display5, display6;
 GLuint textures[6];
+
 int turning = 0, o = 0;
 int FAST = 0;
 
@@ -63,6 +64,8 @@ void createMenus() {
 
 // init
 void init() {
+
+	window_ratio = window_height / window_width;
 	// mesh
 	floorPlane = createPlane(2000, 2000, 200);
 	cube1 = createCube();
@@ -145,10 +148,12 @@ void init() {
 	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 }
 
-// reshape
+
 void reshape(int w, int h) {
 	window_width = w;
 	window_height = h;
+	if (h == 0) h = 1;
+	window_ratio = 1.0f * w / h;
 }
 
 // text
@@ -253,8 +258,8 @@ void display(void) {
 	glPushMatrix();
 	glLoadIdentity();
 	glColor3f(1.0, 1.0, 1.0);
-	renderBitmapString(0.0, window_height - 13.0f, 0.0f, "Use [Arrows] to move in plain");
-	renderBitmapString(0.0, window_height - 26.0f, 0.0f, "Hold [left mouse] and move to look around");
+	renderBitmapString(0.0, window_height - 13.0f, 0.0f, "Use [Arrows] to move in plane");
+	renderBitmapString(0.0, window_height - 26.0f, 0.0f, "Hold [left mouse] to look and change direction");
 	renderBitmapString(0.0, window_height - 39.0f, 0.0f, "Use [W and S] to speed up or slow down");
 	renderBitmapString(0.0, window_height - 52.0f, 0.0f, "Use [Spacebar] to stop");
 	glMatrixMode(GL_PROJECTION);
