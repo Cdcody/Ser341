@@ -176,7 +176,8 @@ void display(void) {
 	// lookAt
 	// gluLookAt(0.0f, 40.0f, 320.0,	0.0f, 1.0f, -1.0f,		0.0f, 1.0f, 0.0f);
 
-	gluLookAt(camera_x, camera_y, camera_z, camera_viewing_x, camera_viewing_y, camera_viewing_z, 0.0f, 1.0f, 0.0f);
+	gluLookAt(x, y, z, x + lx, y + ly, z + lz, 0.0f, 1.0f, 0.0f);
+	//gluLookAt(camera_x, camera_y, camera_z, camera_viewing_x, camera_viewing_y, camera_viewing_z, 0.0f, 1.0f, 0.0f);
 	// camera
 	//glScalef(scale, scale, scale);
 	//glRotatef(x_angle, 1.0f, 0.0f, 0.0f);
@@ -218,8 +219,8 @@ void display(void) {
 
 	// skybox
 	glPushMatrix();
-	glTranslatef(-5500, -4200, -5500);
-	glScalef(2.0, 2.0, 2.0);
+	glTranslatef(GLfloat(skyX), -8500, GLfloat(skyZ));
+	glScalef(3.0, 3.0, 3.0);
 	
 	glDisable(GL_LIGHT0);
 	GLfloat light_emissive2[] = { 1.0, 1.0, 1.0, 1.0 };
@@ -253,14 +254,14 @@ void display(void) {
 	glLoadIdentity();
 	glColor3f(1.0, 1.0, 1.0);
 	renderBitmapString(0.0, window_height - 13.0f, 0.0f, "Use [Arrows] to move in plain");
-	renderBitmapString(0.0, window_height - 26.0f, 0.0f, "Use [W and S] to look up and down");
+	renderBitmapString(0.0, window_height - 26.0f, 0.0f, "Use [W and S] to speed up or slow down");
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
 	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();
 	glutSwapBuffers();
 }
-
+/*
 // rotate what the user see
 void rotate_point(float angle) {
 	float s = sin(angle);
@@ -275,20 +276,26 @@ void rotate_point(float angle) {
 	camera_viewing_x = xnew + camera_x;
 	camera_viewing_z = znew + camera_z;
 }
+*/
 
 // callback function for keyboard (alfanumeric keys)
 void callbackKeyboard(unsigned char key, int x, int y) {
 	switch (key) {
 	case 'w': case 'W':
-		camera_viewing_y += (10);
+		if(speed < 300)
+		speed += (1);
 		break;
 	case 's': case 'S':
-		camera_viewing_y -= (10);
+		if (speed > -300)
+		speed -= (1);
+		break;
+	case ' ':
+			speed = (0);
 		break;
 	}
 }
 
-
+/*
 
 // callback function for arrows
 void specialkeys(int key, int x, int y) {
@@ -319,7 +326,8 @@ void specialkeys(int key, int x, int y) {
 		//camera_viewing_y += 10;
 	}
 }
-/*
+*/
+///*
 void orientMe(float ang) {
 
 	lx = sin(ang); lz = -cos(ang);
@@ -333,27 +341,14 @@ void orientMe(float ang) {
 void moveMeFlat(int i) {
 
 	float newX = x + i * (lx)*0.5;
-
 	float newZ = z + i * (lz)*0.5;
+	//float newSkyX = skyX + i * (lx)*0.5;
+	//float newSkyZ = skyZ + i * (lz)*0.5;
 
-	if (z < -25 || z > 25) {
-		if (newX > -24 && newX < 24)
-			x = newX;
-	}
-	else {
-		if (newX > -99 && newX < 99)
-			x = newX;
-	}
-
-	if (x < -25 || x > 25) {
-		if (newZ > -24 && newZ < 24)
-			z = newZ;
-	}
-	else {
-		if (newZ > -99 && newZ < 99)
-			z = newZ;
-	}
-
+	//skyX = newSkyX;
+	//skyZ = newSkyZ;
+	x = newX;
+	z = newZ;
 }
 
 void mouse(int button, int state, int x, int y) {
@@ -385,14 +380,14 @@ void mySpecial(int key, int x, int y) {
 		if (FAST)
 			moveMeFlat(2.0);
 		else
-			moveMeFlat(1.0);
+			moveMeFlat(20.0);
 		break;
 
 	case GLUT_KEY_DOWN:
 		if (FAST)
 			moveMeFlat(-2.0);
 		else
-			moveMeFlat(-1.0);
+			moveMeFlat(-20.0);
 
 		break;
 
@@ -413,13 +408,19 @@ void mySpecial(int key, int x, int y) {
 
 		break;
 
+
 	}
 
 	glutPostRedisplay();
 
 }
-*/
+//*/
 void myIdle() {
+
+	skyX = x - 9000;
+	skyZ = z - 9000;
+	moveMeFlat(speed);
+
 	if (o == 10) {
 		turning = (turning + 1) % 360;
 		o = 0;
@@ -439,10 +440,11 @@ int main(int argc, char* argv[]) {
 	glutDisplayFunc(display);
 	glutIdleFunc(myIdle);
 
-	//glutMotionFunc(motion);
-	//glutMouseFunc(mouse);
+	glutMotionFunc(motion);
+	glutMouseFunc(mouse);
 
-	glutSpecialFunc(specialkeys);
+	//glutSpecialFunc(specialkeys);
+	glutSpecialFunc(mySpecial);
 	glutKeyboardFunc(callbackKeyboard);
 	init();
 	glutMainLoop();

@@ -18,14 +18,22 @@ int mouse_y = 0;
 float scale = 0.3;
 float x_angle = 0.0;
 float y_angle = 0.0;
-
+float cameraAngle = 0;
+int width = 1200;
+int height = 600;
+int speed = 0;
+int skyX = -9000;
+int skyZ = -9000;
 // camera
-float camera_x = 0.0;
-float camera_y = 300.0;
-float camera_z = 320.0;
+//float camera_x = 0.0;
+//float camera_y = 300.0;
+//float camera_z = 320.0;
 
-float camera_viewing_x = 0.0;
-float camera_viewing_y = 301.0;
-float camera_viewing_z = 0.0;
+//float camera_viewing_x = 0.0;
+//float camera_viewing_y = 301.0;
+//float camera_viewing_z = 0.0;
 
 float total_moving_angle = 0.0;
+
+float x = 0.0f, y = 1.75f, z = 0.0f;
+float lx = 0.0f, ly = 0.0f, lz = -1.0f;
