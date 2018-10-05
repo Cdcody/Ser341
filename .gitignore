@@ -3,6 +3,8 @@
 *.ilk
 *.pdb
 *.tlog
+*.log
+*.idb
 *.obj
 .vs/
 *.vcxproj
