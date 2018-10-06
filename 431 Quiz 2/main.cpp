@@ -14,8 +14,8 @@
 
 #define terrainSamples 100 
  // global
-Mesh *floorPlane, *cube1, *cube2, *cube3, *skybox, *mountains, *startCube, *endCube;
-GLuint display1, display2, display3, display4, display5, display6;
+Mesh *floorPlane, *cubeMesh, *skybox, *mountains, *f16;
+GLuint display1, display2, display3, display4, display5, display6, f16List;
 GLuint textures[6];
 
 //timer info
@@ -75,10 +75,10 @@ void init() {
 	window_ratio = window_height / window_width;
 	// mesh
 	floorPlane = createPlane(2000, 2000, 200);
-	cube1 = createCube();
-	cube2 = createCube();
-	cube3 = createCube();
+	cubeMesh= createCube();
 	skybox = createSkyBox(6000);
+
+	f16 = loadFile("_OBJ_files/f-16.obj");
 
 	ImprovedNoise* noise = new ImprovedNoise();
 
@@ -105,17 +105,20 @@ void init() {
 	calculateNormalPerFace(floorPlane);
 	calculateNormalPerVertex(floorPlane);
 
-	calculateNormalPerFace(cube1);
-	calculateNormalPerVertex(cube1);
+	calculateNormalPerFace(cubeMesh);
+	calculateNormalPerVertex(cubeMesh);
 
-	calculateNormalPerFace(cube2);
-	calculateNormalPerVertex(cube2);
+	calculateNormalPerFace(cubeMesh);
+	calculateNormalPerVertex(cubeMesh);
 
-	calculateNormalPerFace(cube3);
-	calculateNormalPerVertex(cube3);
+	calculateNormalPerFace(cubeMesh);
+	calculateNormalPerVertex(cubeMesh);
 
 	calculateNormalPerFace(skybox);
 	calculateNormalPerVertex(skybox);
+
+	calculateNormalPerFace(f16);
+	calculateNormalPerVertex(f16);
 
 
 	// textures
@@ -124,17 +127,19 @@ void init() {
 	codedTexture(textures, 2, 0); //Sky texture - noise multiscale. Type=0
 	codedTexture(textures, 3, 1); //Marble texture - noise marble. Type=1
 	loadBMP_custom(textures, "_BMP_files/cubesky.bmp", 4);
-	codedTexture(textures, 5, 2); //fire
+	loadBMP_custom(textures, "_BMP_files/metal.bmp", 5);
 	loadBMP_custom(textures, "_BMP_files/grass.bmp", 6);
+	
 
 
 	// display lists
 	display1 = meshToDisplayList(floorPlane, 1, textures[0]);
-	display2 = meshToDisplayList(cube1, 2, textures[5]);
-	display3 = meshToDisplayList(cube2, 3, textures[2]);
-	display4 = meshToDisplayList(cube3, 4, textures[3]);
+	display2 = meshToDisplayList(cubeMesh, 2, textures[5]);
+	display3 = meshToDisplayList(cubeMesh, 3, textures[2]);
+	display4 = meshToDisplayList(cubeMesh, 4, textures[3]);
 	display5 = meshToDisplayList(skybox, 5, textures[4]);
 	display6 = meshToDisplayList(mountains, 6, textures[6]);
+	f16List = meshToDisplayList(f16, 7, textures[5]);
 
 	// configuration
 	glShadeModel(GL_SMOOTH);
@@ -238,8 +243,13 @@ void display(void) {
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslatef(-200, 300, -500);
-	AABB(cube3);
+	//gluLookAt(x, y, z, x + lx, y + ly, z + lz, 0.0f, 1.0f, 0.0f);
+	glTranslatef(x + 100 * lx - 25, y + 100 * ly - 50, z + 100 * lz - 80);
+	//glRotatef(y_angle, 1, 0, 0);
+	glRotatef(cameraAngle * -57.5 + 180, 0, 1, 0);
+	glScalef(10, 10, 10);
+	glCallList(f16List);
+	AABB(f16);
 	glPopMatrix();
 
 	// end
@@ -316,22 +326,6 @@ void display(void) {
 
 	timer = (std::clock() - start) / (double)CLOCKS_PER_SEC;
 }
-/*
-// rotate what the user see
-void rotate_point(float angle) {
-	float s = sin(angle);
-	float c = cos(angle);
-	// translate point back to origin:
-	camera_viewing_x -= camera_x;
-	camera_viewing_z -= camera_z;
-	// rotate point
-	float xnew = camera_viewing_x * c - camera_viewing_z * s;
-	float znew = camera_viewing_x * s + camera_viewing_z * c;
-	// translate point back:
-	camera_viewing_x = xnew + camera_x;
-	camera_viewing_z = znew + camera_z;
-}
-*/
 
 // callback function for keyboard (alfanumeric keys)
 void callbackKeyboard(unsigned char key, int x, int y) {
