@@ -17,6 +17,10 @@ Mesh *floorPlane, *cube1, *cube2, *cube3, *skybox, *mountains;
 GLuint display1, display2, display3, display4, display5, display6;
 GLuint textures[6];
 
+int time = 0;
+
+bool won;
+
 int turning = 0, o = 0;
 int FAST = 0;
 
@@ -157,22 +161,33 @@ void reshape(int w, int h) {
 }
 
 // text
-void renderBitmapString(float x, float y, float z, const char *string) {
+void renderBitmapString(float x, float y, float z, const char *string, bool large) {
 	const char *c;
 	glRasterPos3f(x, y, z);   // fonts position
-	for (c = string; *c != '\0'; c++)
-		glutBitmapCharacter(GLUT_BITMAP_8_BY_13, *c);
+	for (c = string; *c != '\0'; c++) {
+		if (!large) {
+			glutBitmapCharacter(GLUT_BITMAP_8_BY_13, *c);
+		}
+		else {
+			glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *c);
+		}
+		
+	}
 }
 
 // display
 void display(void) {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	bool inStart = false;
+
+
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	// projection
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
 	glLoadIdentity();
-	glViewport(0, 0, window_width, window_height);
+	glViewport(0, window_height * .2, window_width, window_height * .8);
 	gluPerspective(45, window_ratio, 10, 100000);
 	// view
 	glMatrixMode(GL_MODELVIEW);
@@ -251,17 +266,40 @@ void display(void) {
 	glPopMatrix();
 	// texto
 	glMatrixMode(GL_PROJECTION);
+
+
 	glPushMatrix();
 	glLoadIdentity();
+
+	//game help text
 	gluOrtho2D(0, window_width, 0, window_height);
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glLoadIdentity();
 	glColor3f(1.0, 1.0, 1.0);
-	renderBitmapString(0.0, window_height - 13.0f, 0.0f, "Use [Arrows] to move in plane");
-	renderBitmapString(0.0, window_height - 26.0f, 0.0f, "Hold [left mouse] to look and change direction");
-	renderBitmapString(0.0, window_height - 39.0f, 0.0f, "Use [W and S] to speed up or slow down");
-	renderBitmapString(0.0, window_height - 52.0f, 0.0f, "Use [Spacebar] to stop");
+	renderBitmapString(0.0, window_height - 13.0f, 0.0f, "Use [Arrows] to move in plane", false);
+	renderBitmapString(0.0, window_height - 26.0f, 0.0f, "Hold [left mouse] to look and change direction", false);
+	renderBitmapString(0.0, window_height - 39.0f, 0.0f, "Use [W and S] to speed up or slow down", false);
+	renderBitmapString(0.0, window_height - 52.0f, 0.0f, "Use [Spacebar] to stop", false);
+
+	//control viewport
+	glViewport(0, 0, window_width, window_height * .2);
+
+	string timeString = to_string(time);
+
+	renderBitmapString(10, window_height * .65, 0.0f, "Time elapsed: ", true);
+	renderBitmapString(180, window_height * .65, 0.0f, timeString.c_str(), true);
+
+	if (won) {
+		glColor3f(.1, 1, .1);
+		renderBitmapString(500, window_height * .65, 0.0f, "You Win", true);
+	}
+	else if (!inStart && !won) {
+		glColor3f(0, 0, 0);
+		renderBitmapString(500, window_height * .65, 0.0f, "Find the red exit", true);
+	}
+
+
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
 	glMatrixMode(GL_MODELVIEW);
