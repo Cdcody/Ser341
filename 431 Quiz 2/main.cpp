@@ -244,8 +244,9 @@ void display(void) {
 
 	glPushMatrix();
 	//gluLookAt(x, y, z, x + lx, y + ly, z + lz, 0.0f, 1.0f, 0.0f);
-	glTranslatef(x + 100 * lx - 25, y + 100 * ly - 50, z + 100 * lz - 80);
+	glTranslatef(x, y, z);
 	//glRotatef(y_angle, 1, 0, 0);
+	glTranslatef(10 * lx - 25, 10 * ly - 50, 10 * lz);
 	glRotatef(cameraAngle * -57.5 + 180, 0, 1, 0);
 	glScalef(10, 10, 10);
 	glCallList(f16List);
