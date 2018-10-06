@@ -32,29 +32,53 @@ bool won;
 
 int staticAngle, angle1, angle2;
 float turning = 0;
-int FAST = 0;
+float clockSpeed = 1;
+bool shading = false;
 
 // menuListener
-void menuListener(int option) {
+void speedListener(int option) {
 	switch (option) {
 	case 1:
-		FAST = 1; break;
+		clockSpeed = 1; break;
 	case 2:
-		FAST = 0; break;
+		clockSpeed = 2; break;
+	case 3:
+		clockSpeed = 8; break;
+	case 4:
+		clockSpeed = 15; break;
+	}
+	glutPostRedisplay();
+}
+
+void shadingListener(int option) {
+	switch (option) {
+	case 1:
+		shading = false;
+		break;
+	case 2:
+		shading = true;
+		break;
 	}
 	glutPostRedisplay();
 }
 
 // create menu
 void createMenus() {
-
 	// add entries to speed
-	int menuA = glutCreateMenu(menuListener);
-	glutAddMenuEntry("faster", 1);
+	int speedMenu = glutCreateMenu(speedListener);
+	glutAddMenuEntry("slow", 1);
 	glutAddMenuEntry("normal", 2);
+	glutAddMenuEntry("fast", 3);
+	glutAddMenuEntry("seizure", 4);
+
+	int shadingMenu = glutCreateMenu(shadingListener);
+	glutAddMenuEntry("smooth", 1);
+	glutAddMenuEntry("flat", 2);
+
 	// create main menu
-	int menu = glutCreateMenu(menuListener);
-	glutAddSubMenu("Speed", menuA);
+	int menu = glutCreateMenu(speedListener);
+	glutAddSubMenu("Speed", speedMenu);
+	glutAddSubMenu("Shading", shadingMenu);
 	// attach the menu to the right button
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
@@ -62,11 +86,12 @@ void createMenus() {
 
 // init
 void init() {
+	createMenus();
 
 	window_ratio = window_height / window_width;
 	// mesh
 	floorPlane = createPlane(2000, 2000, 200);
-	cubeMesh= createCube();
+	cubeMesh = createCube();
 	skybox = createSkyBox(6000);
 
 	f16 = loadFile("_OBJ_files/f-16.obj");
@@ -134,7 +159,13 @@ void init() {
 	metalFloor = meshToDisplayList(floorPlane, 1, textures[5]);
 
 	// configuration
-	glShadeModel(GL_SMOOTH);
+	if (shading) {
+		glShadeModel(GL_FLAT);
+	}
+	else {
+		glShadeModel(GL_SMOOTH);
+	}
+	
 	glEnable(GL_DEPTH_TEST);
 
 	// light
@@ -410,24 +441,17 @@ void mySpecial(int key, int x, int y) {
 	switch (key) {
 
 	case GLUT_KEY_UP:
-		if (FAST)
-			moveMeFlat(2.0);
-		else
-			moveMeFlat(20.0);
+		moveMeFlat(5 * clockSpeed);
 		break;
 
 	case GLUT_KEY_DOWN:
-		if (FAST)
-			moveMeFlat(-2.0);
-		else
-			moveMeFlat(-20.0);
-
+		moveMeFlat(-5 * clockSpeed);
 		break;
 
 	case GLUT_KEY_LEFT:
 
 
-		cameraAngle -= 0.04f;
+		cameraAngle -= 0.04f * clockSpeed;
 
 		orientMe(cameraAngle);
 
@@ -435,7 +459,7 @@ void mySpecial(int key, int x, int y) {
 
 	case GLUT_KEY_RIGHT:
 
-		cameraAngle += 0.04f;
+		cameraAngle += 0.04f * clockSpeed;
 
 		orientMe(cameraAngle);
 
@@ -453,9 +477,9 @@ void myIdle() {
 	skyX = x - 18000;
 	skyY = y - 18000;
 	skyZ = z - 18000;
-	moveMeFlat(speed);
+	moveMeFlat(speed * clockSpeed);
 
-	turning += .1;
+	turning += .1 * clockSpeed;
 	glutPostRedisplay();
 }
 
