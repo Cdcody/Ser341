@@ -4,6 +4,7 @@
  **/
 
 #include <stdlib.h>
+#include <ctime>
 #include <GL/glut.h>
 #include <fstream>
 #include "mesh.h"
@@ -13,17 +14,19 @@
 
 #define terrainSamples 100 
  // global
-Mesh *floorPlane, *cube1, *cube2, *cube3, *skybox, *mountains;
+Mesh *floorPlane, *cube1, *cube2, *cube3, *skybox, *mountains, *startCube, *endCube;
 GLuint display1, display2, display3, display4, display5, display6;
 GLuint textures[6];
 
-int time = 0;
+//timer info
+std::clock_t start;
+int timer = 0;
 
 bool won;
 
+int staticAngle, angle1, angle2;
 int turning = 0, o = 0;
 int FAST = 0;
-
 
 void defaultmat() {
 	GLfloat ambient[] = { .2, .2, .2, 1 };
@@ -150,6 +153,8 @@ void init() {
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
 	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+
+	start = std::clock();
 }
 
 
@@ -178,9 +183,12 @@ void renderBitmapString(float x, float y, float z, const char *string, bool larg
 // display
 void display(void) {
 
-	bool inStart = false;
+	//resets clock when in starting area
+	bool inStart = (x < 50 && x > -50) && (z < 50 && z > -50);
 
-
+	if (inStart) {
+		start = std::clock();
+	}
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	// projection
@@ -285,7 +293,7 @@ void display(void) {
 	//control viewport
 	glViewport(0, 0, window_width, window_height * .2);
 
-	string timeString = to_string(time);
+	string timeString = to_string(timer) + "s";
 
 	renderBitmapString(10, window_height * .65, 0.0f, "Time elapsed: ", true);
 	renderBitmapString(180, window_height * .65, 0.0f, timeString.c_str(), true);
@@ -295,7 +303,7 @@ void display(void) {
 		renderBitmapString(500, window_height * .65, 0.0f, "You Win", true);
 	}
 	else if (!inStart && !won) {
-		glColor3f(0, 0, 0);
+		glColor3f(255, 0, 255);
 		renderBitmapString(500, window_height * .65, 0.0f, "Find the red exit", true);
 	}
 
@@ -305,6 +313,8 @@ void display(void) {
 	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();
 	glutSwapBuffers();
+
+	timer = (std::clock() - start) / (double)CLOCKS_PER_SEC;
 }
 /*
 // rotate what the user see
@@ -340,48 +350,11 @@ void callbackKeyboard(unsigned char key, int x, int y) {
 	}
 }
 
-/*
-
-// callback function for arrows
-void specialkeys(int key, int x, int y) {
-	if (key == GLUT_KEY_LEFT) {
-		total_moving_angle += -0.05;
-		rotate_point(-0.05);
-	}
-	else if (key == GLUT_KEY_RIGHT) {
-		total_moving_angle += 0.05;
-		rotate_point(0.05);
-	}
-	else if (key == GLUT_KEY_DOWN) {
-		//printf("Down key is pressed\n");
-		//camera_z += 10;
-		camera_x += (-10) * sin(total_moving_angle);//*0.1;
-		camera_z += (-10) * -cos(total_moving_angle);//*0.1;
-		//camera_viewing_y -= 10;
-		camera_viewing_x += (-10) * sin(total_moving_angle);//*0.1;
-		camera_viewing_z += (-10) * -cos(total_moving_angle);//*0.1;
-	}
-	else if (key == GLUT_KEY_UP) {
-		//printf("Up key is pressed\n");
-		//camera_z -= 10;
-		camera_x += (10) * sin(total_moving_angle);//*0.1;
-		camera_z += (10) * -cos(total_moving_angle);//*0.1;
-		camera_viewing_x += (10) * sin(total_moving_angle);//*0.1;
-		camera_viewing_z += (10) * -cos(total_moving_angle);//*0.1;
-		//camera_viewing_y += 10;
-	}
-}
-*/
-///*
 void orientMe(float ang) {
 
 	lx = sin(ang); lz = -cos(ang);
 
 }
-
-
-
-
 
 void moveMeFlat(int i) {
 
