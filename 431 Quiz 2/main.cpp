@@ -13,10 +13,15 @@
 #include "controls.h"
 
 #define terrainSamples 100 
+
+
+void orientMe(float ang);
+
  // global
 Mesh *floorPlane, *cubeMesh, *skybox, *mountains, *f16;
-GLuint display1, display2, display3, display4, display5, display6, f16List;
+GLuint display1, display2, display3, display4, display5, display6, f16List, plainCube;
 GLuint textures[6];
+
 
 //timer info
 std::clock_t start;
@@ -140,6 +145,7 @@ void init() {
 	display5 = meshToDisplayList(skybox, 5, textures[4]);
 	display6 = meshToDisplayList(mountains, 6, textures[6]);
 	f16List = meshToDisplayList(f16, 7, textures[5]);
+	plainCube = meshToDisplayList(cubeMesh, 8, NULL);
 
 	// configuration
 	glShadeModel(GL_SMOOTH);
@@ -187,6 +193,7 @@ void renderBitmapString(float x, float y, float z, const char *string, bool larg
 
 // display
 void display(void) {
+	orientMe(cameraAngle);
 
 	//resets clock when in starting area
 	bool inStart = (x < 50 && x > -50) && (z < 50 && z > -50);
@@ -243,11 +250,12 @@ void display(void) {
 	glPopMatrix();
 
 	glPushMatrix();
-	//gluLookAt(x, y, z, x + lx, y + ly, z + lz, 0.0f, 1.0f, 0.0f);
-	glTranslatef(x, y, z);
+	//glTranslatef(x, y, z);
 	//glRotatef(y_angle, 1, 0, 0);
-	glTranslatef(10 * lx - 25, 10 * ly - 50, 10 * lz);
+	glTranslatef(x + lx * 20, y + ly * 20 , z + lz * 20);
 	glRotatef(cameraAngle * -57.5 + 180, 0, 1, 0);
+	glTranslatef(16, -75, 120);
+	//glTranslatef(10 * lx, 10 * ly - 50, 10 * lz);
 	glScalef(10, 10, 10);
 	glCallList(f16List);
 	AABB(f16);

@@ -35,5 +35,5 @@ int skyZ = -18000;
 
 float total_moving_angle = 0.0;
 
-float x = 0.0f, y = 1.75f, z = 0.0f;
+float x = 0.0f, y = 0, z = 0.0f;
 float lx = 0.0f, ly = 0.0f, lz = -1.0f;
