@@ -7,4 +7,4 @@
 *.idb
 *.obj
 .vs/
-*.vcxproj
+*.vcxproj*

@@ -9,14 +9,12 @@
 
 #define GL_CLAMP_TO_EDGE 0x812F
 #define GL_TEXTURE_WRAP_R 0x8072
-// draw
 GLuint meshToDisplayList(Mesh* m, int id, int texture) {
 	GLuint listID = glGenLists(id);
 	glNewList(listID, GL_COMPILE);
 	glEnable(GL_TEXTURE_2D);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	glBindTexture(GL_TEXTURE_2D, texture);
-	//}
 	glBegin(GL_TRIANGLES);
 	for (unsigned int i = 0; i < m->face_index_vertex.size(); i++) {
 		// PER VERTEX NORMALS

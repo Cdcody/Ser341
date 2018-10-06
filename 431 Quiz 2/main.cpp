@@ -11,6 +11,7 @@
 #include "texture.h"
 #include "render.h"
 #include "controls.h"
+#include "material.h"
 
 #define terrainSamples 100 
 
@@ -19,7 +20,7 @@ void orientMe(float ang);
 
  // global
 Mesh *floorPlane, *cubeMesh, *skybox, *mountains, *f16;
-GLuint display1, display2, display3, display4, display5, display6, f16List, plainCube;
+GLuint brickFloor, metalFloor, metalBox, woodBox, marbleBox, skyBox, terrain, f16List;
 GLuint textures[6];
 
 
@@ -32,21 +33,6 @@ bool won;
 int staticAngle, angle1, angle2;
 int turning = 0, o = 0;
 int FAST = 0;
-
-void defaultmat() {
-	GLfloat ambient[] = { .2, .2, .2, 1 };
-	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient);
-
-	GLfloat diffuse[] = { .8, .8, .8, 1 };
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse);
-
-	GLfloat specular[] = { 0, 0, 0, 1 };
-	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
-
-	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 0);
-}
-
-
 
 // menuListener
 void menuListener(int option) {
@@ -138,14 +124,14 @@ void init() {
 
 
 	// display lists
-	display1 = meshToDisplayList(floorPlane, 1, textures[0]);
-	display2 = meshToDisplayList(cubeMesh, 2, textures[5]);
-	display3 = meshToDisplayList(cubeMesh, 3, textures[2]);
-	display4 = meshToDisplayList(cubeMesh, 4, textures[3]);
-	display5 = meshToDisplayList(skybox, 5, textures[4]);
-	display6 = meshToDisplayList(mountains, 6, textures[6]);
+	brickFloor = meshToDisplayList(floorPlane, 1, textures[0]);
+	metalBox = meshToDisplayList(cubeMesh, 2, textures[5]);
+	woodBox = meshToDisplayList(cubeMesh, 3, textures[1]);
+	marbleBox = meshToDisplayList(cubeMesh, 4, textures[3]);
+	skyBox = meshToDisplayList(skybox, 5, textures[4]);
+	terrain = meshToDisplayList(mountains, 6, textures[6]);
 	f16List = meshToDisplayList(f16, 7, textures[5]);
-	plainCube = meshToDisplayList(cubeMesh, 8, NULL);
+	metalFloor = meshToDisplayList(floorPlane, 1, textures[5]);
 
 	// configuration
 	glShadeModel(GL_SMOOTH);
@@ -201,6 +187,11 @@ void display(void) {
 	if (inStart) {
 		start = std::clock();
 	}
+	bool inFinish = (z < 9500 && z > 8000) && (x < -3500 && x > -5000);
+	if (inFinish) {
+		won = true;
+	}
+
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	// projection
@@ -232,7 +223,7 @@ void display(void) {
 	// box 1
 	glPushMatrix();
 	glTranslatef(0, 300, 0);
-	glCallList(display2);
+	glCallList(metalBox);
 	glPopMatrix();
 	// box 2
 	glPushMatrix();
@@ -241,21 +232,33 @@ void display(void) {
 	//glRotatef((GLint)rotating, 0.0, 1.0, 0.0);
 	glRotatef((GLint)turning, 0.0, 1.0, 0.0);
 	glTranslatef(-400.0, 0.0, 0.0);
-	glCallList(display3);
+	glCallList(woodBox);
 	glPopMatrix();
 	// box 3
 	glPushMatrix();
 	glTranslatef(-200, 300, 0);
-	glCallList(display4);
+	glCallList(marbleBox);
+	glPopMatrix();
+
+	//draw start and ending areas
+	glPushMatrix();
+	glTranslatef(-750, -700, -900);
+	glScalef(.75, 1, .75);
+	glCallList(brickFloor);
 	glPopMatrix();
 
 	glPushMatrix();
-	//glTranslatef(x, y, z);
-	//glRotatef(y_angle, 1, 0, 0);
+	glTranslatef(-5000, -600, 8000);
+	glScalef(.75, 1, .75);
+	glCallList(metalFloor);
+	glPopMatrix();
+
+
+	//draws airplane and its bounding box
+	glPushMatrix();
 	glTranslatef(x + lx * 20, y + ly * 20 , z + lz * 20);
 	glRotatef(cameraAngle * -57.5 + 180, 0, 1, 0);
 	glTranslatef(16, -75, 120);
-	//glTranslatef(10 * lx, 10 * ly - 50, 10 * lz);
 	glScalef(10, 10, 10);
 	glCallList(f16List);
 	AABB(f16);
@@ -272,7 +275,7 @@ void display(void) {
 	glDisable(GL_LIGHT0);
 	GLfloat light_emissive2[] = { 1.0, 1.0, 1.0, 1.0 };
 	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, light_emissive2);
-	glCallList(display5);
+	glCallList(skyBox);
 	glPopMatrix();
 
 	glEnable(GL_LIGHT0);
@@ -283,7 +286,7 @@ void display(void) {
 	
 	glTranslatef(-12000, 300, -12000);
 	glScalef(300, 1200, 300);
-	glCallList(display6);
+	glCallList(terrain);
 	glPopMatrix();
 
 	// end
@@ -314,16 +317,21 @@ void display(void) {
 
 	string timeString = to_string(timer) + "s";
 
+	/* for testing position
+	string coords = to_string(x) + ", " + to_string(y) + ", "
+		+ to_string(z) + ": " + to_string(inFinish);*/
+
 	renderBitmapString(10, window_height * .65, 0.0f, "Time elapsed: ", true);
 	renderBitmapString(180, window_height * .65, 0.0f, timeString.c_str(), true);
 
+	
 	if (won) {
 		glColor3f(.1, 1, .1);
 		renderBitmapString(500, window_height * .65, 0.0f, "You Win", true);
 	}
 	else if (!inStart && !won) {
 		glColor3f(255, 0, 255);
-		renderBitmapString(500, window_height * .65, 0.0f, "Find the red exit", true);
+		renderBitmapString(window_width - 400, window_height * .65, 0.0f, "Reach the metal surface", true);
 	}
 
 
@@ -333,7 +341,9 @@ void display(void) {
 	glPopMatrix();
 	glutSwapBuffers();
 
-	timer = (std::clock() - start) / (double)CLOCKS_PER_SEC;
+	if (!won) {
+		timer = (std::clock() - start) / (double)CLOCKS_PER_SEC;
+	}
 }
 
 // callback function for keyboard (alfanumeric keys)
