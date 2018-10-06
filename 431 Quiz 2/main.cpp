@@ -31,7 +31,7 @@ int timer = 0;
 bool won;
 
 int staticAngle, angle1, angle2;
-int turning = 0, o = 0;
+float turning = 0;
 int FAST = 0;
 
 // menuListener
@@ -208,37 +208,37 @@ void display(void) {
 	// gluLookAt(0.0f, 40.0f, 320.0,	0.0f, 1.0f, -1.0f,		0.0f, 1.0f, 0.0f);
 
 	gluLookAt(x, y, z, x + lx, y + ly, z + lz, 0.0f, 1.0f, 0.0f);
-	//gluLookAt(camera_x, camera_y, camera_z, camera_viewing_x, camera_viewing_y, camera_viewing_z, 0.0f, 1.0f, 0.0f);
-	// camera
-	//glScalef(scale, scale, scale);
-	//glRotatef(x_angle, 1.0f, 0.0f, 0.0f);
-	//glRotatef(y_angle, 0.0f, 1.0f, 0.0f);
-	//glTranslatef(0.0f, 0.0f, 0.0f);
 
-	//plane
-	//glPushMatrix();
-	//glTranslatef(-1000, 200, -1000);
-	//glCallList(display1);
-	//glPopMatrix();
-	// box 1
+	// static rotation
 	glPushMatrix();
-	glTranslatef(0, 300, 0);
-	glCallList(metalBox);
-	glPopMatrix();
-	// box 2
-	glPushMatrix();
-	glTranslatef(200, 300, 0);
-	//glTranslatef(0, 17, 500);
-	//glRotatef((GLint)rotating, 0.0, 1.0, 0.0);
-	glRotatef((GLint)turning, 0.0, 1.0, 0.0);
-	glTranslatef(-400.0, 0.0, 0.0);
+	glTranslatef(0, 100, -800);
+	glTranslatef(150 * cos(turning / 10), 0.0, 150 * sin(turning / 10));
 	glCallList(woodBox);
 	glPopMatrix();
-	// box 3
+
+	// stationary box 1
 	glPushMatrix();
-	glTranslatef(-200, 300, 0);
-	glCallList(marbleBox);
+		glTranslatef(0, 100, -800);
+		glCallList(metalBox);
+
+	
+		// primary orbit around box 1
+		glPushMatrix();
+			glRotatef(turning, 0, 0, 1);
+			glTranslatef(300, 0, 0);
+			glCallList(marbleBox);
+
+			// moon/mini box in secondary orbit
+			glPushMatrix();
+				glRotatef(turning * 3, 0, 1, 0);
+				glTranslatef(100, 0, 0);
+				glScalef(.2, .2, .2);
+				glCallList(marbleBox);
+			glPopMatrix();
+
+		glPopMatrix();
 	glPopMatrix();
+
 
 	//draw start and ending areas
 	glPushMatrix();
@@ -455,11 +455,7 @@ void myIdle() {
 	skyZ = z - 18000;
 	moveMeFlat(speed);
 
-	if (o == 10) {
-		turning = (turning + 1) % 360;
-		o = 0;
-	}
-	o++;
+	turning += .1;
 	glutPostRedisplay();
 }
 
