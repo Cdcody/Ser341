@@ -36,3 +36,18 @@ GLuint meshToDisplayList(Mesh* m, int id, int texture) {
 	glEndList();
 	return listID;
 }
+
+// text
+void renderBitmapString(float x, float y, float z, const char *string, bool large) {
+	const char *c;
+	glRasterPos3f(x, y, z);   // fonts position
+	for (c = string; *c != '\0'; c++) {
+		if (!large) {
+			glutBitmapCharacter(GLUT_BITMAP_8_BY_13, *c);
+		}
+		else {
+			glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *c);
+		}
+
+	}
+}

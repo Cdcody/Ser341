@@ -13,21 +13,23 @@
 #include "controls.h"
 #include "material.h"
 #include "menu.h"
+#include "particles.h"
+#include "timer.h"
 
 #define terrainSamples 100 
 
-
-void orientMe(float ang);
 
  // global
 Mesh *floorPlane, *cubeMesh, *skybox, *mountains, *f16;
 GLuint brickFloor, metalFloor, metalBox, woodBox, marbleBox, skyBox, terrain, f16List;
 GLuint textures[6];
 
+ParticleSystem* jetFlame = new ParticleSystem();
 
 //timer info
 std::clock_t start;
 int timer = 0;
+float particleTimer = 0;
 
 bool won;
 
@@ -36,6 +38,7 @@ int staticAngle, angle1, angle2;
 
 // init
 void init() {
+	init_frame_timer();
 	createMenus();
 
 	window_ratio = window_height / window_width;
@@ -143,21 +146,6 @@ void reshape(int w, int h) {
 	window_ratio = 1.0f * w / h;
 }
 
-// text
-void renderBitmapString(float x, float y, float z, const char *string, bool large) {
-	const char *c;
-	glRasterPos3f(x, y, z);   // fonts position
-	for (c = string; *c != '\0'; c++) {
-		if (!large) {
-			glutBitmapCharacter(GLUT_BITMAP_8_BY_13, *c);
-		}
-		else {
-			glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *c);
-		}
-		
-	}
-}
-
 // display
 void display(void) {
 	orientMe(cameraAngle);
@@ -190,11 +178,16 @@ void display(void) {
 
 	gluLookAt(x, y, z, x + lx, y + ly, z + lz, 0.0f, 1.0f, 0.0f);
 
+	jetFlame->add();
+	jetFlame->update(calculate_frame_time());
+	jetFlame->remove();
+
 	// static rotation
 	glPushMatrix();
 	glTranslatef(0, 100, -800);
 	glTranslatef(150 * cos(turning / 10), 0.0, 150 * sin(turning / 10));
 	glCallList(woodBox);
+	jetFlame->drawParticles(woodBox);
 	glPopMatrix();
 
 	// stationary box 1
@@ -323,7 +316,9 @@ void display(void) {
 	glutSwapBuffers();
 
 	if (!won) {
-		timer = (std::clock() - start) / (double)CLOCKS_PER_SEC;
+		int temp = std::clock();
+		timer = (temp - start) / (double)CLOCKS_PER_SEC;
+		particleTimer = (temp - start) / (double)CLOCKS_PER_SEC;
 	}
 }
 
