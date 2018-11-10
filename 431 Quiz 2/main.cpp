@@ -21,8 +21,8 @@
 
  // global
 Mesh *floorPlane, *cubeMesh, *skybox, *mountains, *f16;
-GLuint brickFloor, metalFloor, metalBox, woodBox, marbleBox, skyBox, terrain, f16List;
-GLuint textures[6];
+GLuint brickFloor, metalFloor, metalBox, woodBox, marbleBox, skyBox, terrain, f16List, fireCube;
+GLuint textures[10];
 
 ParticleSystem* jetFlame = new ParticleSystem();
 
@@ -77,12 +77,6 @@ void init() {
 	calculateNormalPerFace(cubeMesh);
 	calculateNormalPerVertex(cubeMesh);
 
-	calculateNormalPerFace(cubeMesh);
-	calculateNormalPerVertex(cubeMesh);
-
-	calculateNormalPerFace(cubeMesh);
-	calculateNormalPerVertex(cubeMesh);
-
 	calculateNormalPerFace(skybox);
 	calculateNormalPerVertex(skybox);
 
@@ -98,6 +92,7 @@ void init() {
 	loadBMP_custom(textures, "_BMP_files/cubesky.bmp", 4);
 	loadBMP_custom(textures, "_BMP_files/metal.bmp", 5);
 	loadBMP_custom(textures, "_BMP_files/grass.bmp", 6);
+	codedTexture(textures, 7, 2);
 	
 
 
@@ -106,6 +101,7 @@ void init() {
 	metalBox = meshToDisplayList(cubeMesh, 2, textures[5]);
 	woodBox = meshToDisplayList(cubeMesh, 3, textures[1]);
 	marbleBox = meshToDisplayList(cubeMesh, 4, textures[3]);
+	fireCube = meshToDisplayList(cubeMesh, 8, textures[7]);
 	skyBox = meshToDisplayList(skybox, 5, textures[4]);
 	terrain = meshToDisplayList(mountains, 6, textures[6]);
 	f16List = meshToDisplayList(f16, 7, textures[5]);
@@ -187,7 +183,6 @@ void display(void) {
 	glTranslatef(0, 100, -800);
 	glTranslatef(150 * cos(turning / 10), 0.0, 150 * sin(turning / 10));
 	glCallList(woodBox);
-	jetFlame->drawParticles(woodBox);
 	glPopMatrix();
 
 	// stationary box 1
@@ -236,6 +231,17 @@ void display(void) {
 	glScalef(10, 10, 10);
 	glCallList(f16List);
 	AABB(f16);
+	glPopMatrix();
+
+	//draw fire particles 
+	glPushMatrix();
+	glTranslatef(x + lx * 20, y + ly * 20, z + lz * 20);
+	glRotatef(cameraAngle * -57.5, 0, 1, 0);
+	//glTranslatef(16, -75, 120);
+	glTranslatef(-2, -40, -70);
+	glRotatef(90, 1, 0, 0);
+	glScalef(.05, .05, .05);
+	jetFlame->drawParticles(fireCube);
 	glPopMatrix();
 
 	// end
