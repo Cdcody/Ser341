@@ -12,6 +12,7 @@
 #include "render.h"
 #include "controls.h"
 #include "material.h"
+#include "menu.h"
 
 #define terrainSamples 100 
 
@@ -31,57 +32,6 @@ int timer = 0;
 bool won;
 
 int staticAngle, angle1, angle2;
-float turning = 0;
-float clockSpeed = 1;
-bool shading = false;
-
-// menuListener
-void speedListener(int option) {
-	switch (option) {
-	case 1:
-		clockSpeed = 1; break;
-	case 2:
-		clockSpeed = 2; break;
-	case 3:
-		clockSpeed = 8; break;
-	case 4:
-		clockSpeed = 15; break;
-	}
-	glutPostRedisplay();
-}
-
-void shadingListener(int option) {
-	switch (option) {
-	case 1:
-		shading = false;
-		break;
-	case 2:
-		shading = true;
-		break;
-	}
-	glutPostRedisplay();
-}
-
-// create menu
-void createMenus() {
-	// add entries to speed
-	int speedMenu = glutCreateMenu(speedListener);
-	glutAddMenuEntry("slow", 1);
-	glutAddMenuEntry("normal", 2);
-	glutAddMenuEntry("fast", 3);
-	glutAddMenuEntry("seizure", 4);
-
-	int shadingMenu = glutCreateMenu(shadingListener);
-	glutAddMenuEntry("smooth", 1);
-	glutAddMenuEntry("flat", 2);
-
-	// create main menu
-	int menu = glutCreateMenu(speedListener);
-	glutAddSubMenu("Speed", speedMenu);
-	glutAddSubMenu("Shading", shadingMenu);
-	// attach the menu to the right button
-	glutAttachMenu(GLUT_RIGHT_BUTTON);
-}
 
 
 // init
@@ -377,111 +327,6 @@ void display(void) {
 	}
 }
 
-// callback function for keyboard (alfanumeric keys)
-void callbackKeyboard(unsigned char key, int x, int y) {
-	switch (key) {
-	case 'w': case 'W':
-		if(speed < 200)
-		speed += (1);
-		break;
-	case 's': case 'S':
-		if (speed > -200)
-		speed -= (1);
-		break;
-	case ' ':
-			speed = (0);
-		break;
-	}
-}
-
-void orientMe(float ang) {
-
-	lx = sin(ang); lz = -cos(ang);
-
-}
-
-void moveMeFlat(int i) {
-
-	float newX = x + i * (lx)*0.5;
-	float newY = y + i * (ly)*0.5;
-	float newZ = z + i * (lz)*0.5;
-	//float newSkyX = skyX + i * (lx)*0.5;
-	//float newSkyZ = skyZ + i * (lz)*0.5;
-
-	//skyX = newSkyX;
-	//skyZ = newSkyZ;
-	x = newX;
-	y = newY;
-	z = newZ;
-}
-
-void mouse(int button, int state, int x, int y) {
-	mouse_x = x;
-	mouse_y = y;
-	mouse_button = button;
-}
-
-//lx = sin(ang); lz = -cos(ang);
-// motion
-void motion(int x, int y) {
-	if (mouse_button == GLUT_LEFT_BUTTON) {
-
-		cameraAngle += (float(x - mouse_x) / width);
-
-		orientMe(cameraAngle);
-		ly -= (float(y - mouse_y) / height);
-	}
-	mouse_x = x;
-	mouse_y = y;
-	glutPostRedisplay();
-}
-
-void mySpecial(int key, int x, int y) {
-
-	switch (key) {
-
-	case GLUT_KEY_UP:
-		moveMeFlat(5 * clockSpeed);
-		break;
-
-	case GLUT_KEY_DOWN:
-		moveMeFlat(-5 * clockSpeed);
-		break;
-
-	case GLUT_KEY_LEFT:
-
-
-		cameraAngle -= 0.04f * clockSpeed;
-
-		orientMe(cameraAngle);
-
-		break;
-
-	case GLUT_KEY_RIGHT:
-
-		cameraAngle += 0.04f * clockSpeed;
-
-		orientMe(cameraAngle);
-
-		break;
-
-
-	}
-
-	glutPostRedisplay();
-
-}
-//*/
-void myIdle() {
-
-	skyX = x - 18000;
-	skyY = y - 18000;
-	skyZ = z - 18000;
-	moveMeFlat(speed * clockSpeed);
-
-	turning += .1 * clockSpeed;
-	glutPostRedisplay();
-}
 
 // main
 int main(int argc, char* argv[]) {
