@@ -33,6 +33,9 @@ float clockSpeed = 1;
 float turning = 0;
 
 vector<Vec3f>* cameraVec;
+bool cameraMode = false;
+int cameraFrame = 0;
+int cameraX, cameraY, cameraZ;
 
 // camera
 //float camera_x = 0.0;
@@ -61,9 +64,8 @@ void callbackKeyboard(unsigned char key, int xx, int yy) {
 			speed -= (1);
 		break;
 	case 'g': case 'G':
-		x = (*cameraVec)[0].x;
-		y = (*cameraVec)[0].y;
-		z = (*cameraVec)[0].z;
+		cameraMode = true;
+		speed = 0;
 		break;
 	case ' ':
 		speed = (0);
@@ -157,6 +159,14 @@ void myIdle() {
 
 	turning += .1 * clockSpeed;
 	glutPostRedisplay();
+
+	if (cameraMode) {
+		vector<Vec3f> temp = *cameraVec;
+		cameraX = temp[cameraFrame].x;
+		cameraY = temp[cameraFrame].y;
+		cameraZ = temp[cameraFrame].z;
+		cameraFrame++;
+	}
 
 	//if (t == 100) {
 	//		x = (*cameraVec)[i].x;

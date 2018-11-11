@@ -10,7 +10,7 @@
 #include "mesh.h"
 
 vector<Vec3f>* hermiteCurve(float geometry[][3], int points) {
-	vector<Vec3f>* vec = new vector<Vec3f>(points);
+	vector<Vec3f>* vec = new vector<Vec3f>();
 
 	for (int i = 0; i != points; ++i) {
 		float t = (float)i / (points - 1);
@@ -24,7 +24,8 @@ vector<Vec3f>* hermiteCurve(float geometry[][3], int points) {
 		float y = b0 * geometry[0][1] + b1 * geometry[1][1] + b2 * geometry[2][1] + b3 * geometry[3][1];
 		float z = b0 * geometry[0][2] + b1 * geometry[1][2] + b2 * geometry[2][2] + b3 * geometry[3][2];
 		// specify the point
-		vec->push_back(Vec3f(x, y, z));
+		Vec3f temp = Vec3f(x, y, z);
+		vec->push_back(temp);
 	}
 	return vec;
 }

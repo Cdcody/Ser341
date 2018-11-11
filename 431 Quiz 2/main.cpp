@@ -43,7 +43,7 @@ int staticAngle, angle1, angle2;
 const int V_size = 6;
 const int U_size = 6;
 const int ORDER = 4;
-GLfloat ctlpoints[U_size][V_size][3] = {
+GLfloat mountainControlPoints[U_size][V_size][3] = {
 	{ { 25, 5,  15 } ,{ 20, 5,  15 },{ 0, 10,  15 },{ -5, 10,  15 },{ -10, 5,  15 }   ,{ -15, 5,  15 } },
 	{ { 25, 5,  10 } ,{ 20, 0,  10 },{ 0, 20,  10 },{ -5, 19,  10 },{ -10, 0,  10 }   ,{ -15, 5,  10 } },
 	{ { 25, 0,   5 } ,{ 20, 0,   5 },{ 0, 15,   5 },{ -5, 15,   5 },{ -10, 12,   5 } ,{ -15, 0,  5 } },
@@ -55,10 +55,20 @@ GLfloat vknots[V_size + ORDER] = { 0.0, 0.0, 0.0, 0.0, 1.0, 3.0, 5.0, 5.0, 5.0, 
 GLfloat uknots[U_size + ORDER] = { 0.0, 0.0, 0.0, 0.0, 1.0, 3.0, 5.0, 5.0, 5.0, 5.0 };
 
 
+//camera path parameters 
+GLfloat cameraPathControlPoints[4][3] = {
+	{ -800, 0, 0 },
+	{ 0, 0, 800 },
+	{ 800,  0, 0 },
+	{ 0, 0, -800 },
+};
+
 // init
 void init() {
 	init_frame_timer();
 	createMenus();
+
+	cameraVec = hermiteCurve(cameraPathControlPoints, 100);
 
 	window_ratio = window_height / window_width;
 	// mesh
@@ -179,7 +189,7 @@ void drawNurb() {
 		V_size + ORDER, vknots,
 		V_size * 3,
 		3,
-		&ctlpoints[0][0][0],
+		&mountainControlPoints[0][0][0],
 		ORDER, ORDER,
 		GL_MAP2_VERTEX_3);
 	gluEndSurface(theNurb);
@@ -191,7 +201,7 @@ void drawNurb() {
 	for (int i = 0; i < U_size; i++) {
 		glBegin(GL_LINE_STRIP);
 		for (int j = 0; j < V_size; j++) {
-			glVertex3f(ctlpoints[i][j][0], ctlpoints[i][j][1], ctlpoints[i][j][2]);
+			glVertex3f(mountainControlPoints[i][j][0], mountainControlPoints[i][j][1], mountainControlPoints[i][j][2]);
 		}
 		glEnd();
 	}
@@ -201,7 +211,7 @@ void drawNurb() {
 	glBegin(GL_POINTS);
 	for (int i = 0; i < U_size; i++) {
 		for (int j = 0; j < V_size; j++) {
-			glVertex3f(ctlpoints[i][j][0], ctlpoints[i][j][1], ctlpoints[i][j][2]);
+			glVertex3f(mountainControlPoints[i][j][0], mountainControlPoints[i][j][1], mountainControlPoints[i][j][2]);
 		}
 	}
 	glEnd();
@@ -243,27 +253,22 @@ void display(void) {
 
 
 	//**********************************************************************************************camera curve begin
-	gluLookAt(x, y, z, x + lx, y + ly, z + lz, 0.0f, 1.0f, 0.0f);
+	if (!cameraMode) {
+		gluLookAt(x, y, z, x + lx, y + ly, z + lz, 0.0f, 1.0f, 0.0f);
+	}
+	else {
+		gluLookAt(cameraX, cameraY, cameraZ, x, y, z, 0.0f, 1.0f, 0.0f);
+	}
 
 
-	GLfloat ctlpoints[4][3] = {
-		{ -800, 0, 0 },
-		{ 0, 0, 800 },
-		{ 800,  0, 0 },
-		{ 0, 0, -800 },
-	};
-
-	glPointSize(10);
+	glPointSize(100);
 	glColor3f(1, 0, 0);
 	glBegin(GL_POINTS);
 	glPointSize(10);
 	for (int i = 0; i != 4; ++i) {
-		glVertex3fv(ctlpoints[i]);
+		glVertex3fv(cameraPathControlPoints[i]);
 	}
-	glEnd();
-
-	cameraVec = hermiteCurve(ctlpoints, 100);
-	
+	glEnd();	
 	//**********************************************************************************************camera curve end
 
 
