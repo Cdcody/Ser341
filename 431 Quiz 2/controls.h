@@ -45,12 +45,12 @@ vector<Vec3f>* cameraVec;
 
 float total_moving_angle = 0.0;
 
-float x = 0.0f, y = 0, z = 0.0f;
+float x = 0.0f, y = 0.0f, z = 0.0f;
 float lx = 0.0f, ly = 0.0f, lz = -1.0f;
 
 
 // callback function for keyboard (alfanumeric keys)
-void callbackKeyboard(unsigned char key, int x, int y) {
+void callbackKeyboard(unsigned char key, int xx, int yy) {
 	switch (key) {
 	case 'w': case 'W':
 		if (speed < 200)
