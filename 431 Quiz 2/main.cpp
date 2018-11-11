@@ -68,7 +68,7 @@ void init() {
 	init_frame_timer();
 	createMenus();
 
-	cameraVec = hermiteCurve(cameraPathControlPoints, 100);
+	cameraVec = hermiteCurve(cameraPathControlPoints, 1000);
 
 	window_ratio = window_height / window_width;
 	// mesh
@@ -261,7 +261,7 @@ void display(void) {
 	}
 
 
-	glPointSize(100);
+	glPointSize(50);
 	glColor3f(1, 0, 0);
 	glBegin(GL_POINTS);
 	glPointSize(10);

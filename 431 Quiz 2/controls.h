@@ -28,7 +28,7 @@ int skyZ = -18000;
 bool won;
 
 
-int t;
+int t = 0;
 float clockSpeed = 1;
 float turning = 0;
 
@@ -150,7 +150,6 @@ void mySpecial(int key, int x, int y) {
 	glutPostRedisplay();
 
 }
-int i = 0;
 void myIdle() {
 	skyX = x - 18000;
 	skyY = y - 18000;
@@ -158,23 +157,25 @@ void myIdle() {
 	moveMeFlat(speed * clockSpeed);
 
 	turning += .1 * clockSpeed;
-	glutPostRedisplay();
+	
 
 	if (cameraMode) {
-		vector<Vec3f> temp = *cameraVec;
-		cameraX = temp[cameraFrame].x;
-		cameraY = temp[cameraFrame].y;
-		cameraZ = temp[cameraFrame].z;
+		if (/*t == 2 &&*/ cameraFrame < 1000) {
+			cameraX = (*cameraVec)[cameraFrame].x;
+		cameraY = (*cameraVec)[cameraFrame].x;
+		cameraZ = (*cameraVec)[cameraFrame].x;
 		cameraFrame++;
+		//t = 0;
+		}
+		t++;
+		//vector<Vec3f> temp = *cameraVec;
+		//cameraX = temp[cameraFrame].x;
+		//cameraY = temp[cameraFrame].y;
+		//cameraZ = temp[cameraFrame].z;
+		//cameraFrame++;
 	}
+	
 
-	//if (t == 100) {
-	//		x = (*cameraVec)[i].x;
-	//		y = (*cameraVec)[i].y;
-	//		z = (*cameraVec)[i].z;
-	//	t = 0;
-	//}
-	//t++;
-	//i++;
-		
+	
+	glutPostRedisplay();
 }
