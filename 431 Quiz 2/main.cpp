@@ -15,6 +15,7 @@
 #include "menu.h"
 #include "particles.h"
 #include "timer.h"
+#include "curves.h"
 
 #define terrainSamples 100 
 
@@ -22,6 +23,7 @@
  // global
 Mesh *floorPlane, *cubeMesh, *skybox, *mountains, *f16;
 GLuint brickFloor, metalFloor, metalBox, woodBox, marbleBox, skyBox, terrain, f16List, fireCube;
+GLUnurbsObj *theNurb;
 GLuint textures[10];
 
 ParticleSystem* jetFlame = new ParticleSystem();
@@ -34,6 +36,22 @@ float particleTimer = 0;
 bool won;
 
 int staticAngle, angle1, angle2;
+
+
+//3d surface parameters
+const int V_size = 6;
+const int U_size = 6;
+const int ORDER = 4;
+GLfloat ctlpoints[U_size][V_size][3] = {
+	{ { 25, 5,  15 } ,{ 20, 5,  15 },{ 0, 10,  15 },{ -5, 10,  15 },{ -10, 5,  15 }   ,{ -15, 5,  15 } },
+	{ { 25, 5,  10 } ,{ 20, 0,  10 },{ 0, 20,  10 },{ -5, 19,  10 },{ -10, 0,  10 }   ,{ -15, 5,  10 } },
+	{ { 25, 0,   5 } ,{ 20, 0,   5 },{ 0, 15,   5 },{ -5, 15,   5 },{ -10, 12,   5 } ,{ -15, 0,  5 } },
+	{ { 25, 0,  -5 } ,{ 20, 0,  -5 },{ 0, 40,  -5 },{ -5, 35,  -5 },{ -10, 8,  -5 } ,{ -15, 0,  -5 } },
+	{ { 25, 5,  -10 } ,{ 20, 0, -10 },{ 0, 0, -10 },{ -5, 0, -10 },{ -10, 0, -10 }   ,{ -15, 5,  -10 } },
+	{ { 25, 0,  -15 } ,{ 20, -5, -15 },{ 0, 0, -15 },{ -5, 0, -15 },{ -10, 5, -15 }   ,{ -15, 5,  -15 } }
+};
+GLfloat vknots[V_size + ORDER] = { 0.0, 0.0, 0.0, 0.0, 1.0, 3.0, 5.0, 5.0, 5.0, 5.0 };
+GLfloat uknots[U_size + ORDER] = { 0.0, 0.0, 0.0, 0.0, 1.0, 3.0, 5.0, 5.0, 5.0, 5.0 };
 
 
 // init
@@ -131,6 +149,11 @@ void init() {
 	glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
 	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_AUTO_NORMAL);
+	glEnable(GL_NORMALIZE);
+	glEnable(GL_AUTO_NORMAL);
+
 	start = std::clock();
 }
 
@@ -140,6 +163,49 @@ void reshape(int w, int h) {
 	window_height = h;
 	if (h == 0) h = 1;
 	window_ratio = 1.0f * w / h;
+}
+
+void drawNurb() {
+	theNurb = gluNewNurbsRenderer();
+	gluNurbsProperty(theNurb, GLU_SAMPLING_TOLERANCE, 200);
+	gluNurbsProperty(theNurb, GLU_DISPLAY_MODE, GLU_FILL);
+	gluNurbsProperty(theNurb, GLU_CULLING, true);
+
+	glPushMatrix();
+	gluBeginSurface(theNurb);
+	gluNurbsSurface(theNurb,
+		U_size + ORDER, uknots,
+		V_size + ORDER, vknots,
+		V_size * 3,
+		3,
+		&ctlpoints[0][0][0],
+		ORDER, ORDER,
+		GL_MAP2_VERTEX_3);
+	gluEndSurface(theNurb);
+	
+	// control graph
+	glDisable(GL_LIGHTING);
+	glPointSize(1.0);
+	glColor3f(0, 0, 1);
+	for (int i = 0; i < U_size; i++) {
+		glBegin(GL_LINE_STRIP);
+		for (int j = 0; j < V_size; j++) {
+			glVertex3f(ctlpoints[i][j][0], ctlpoints[i][j][1], ctlpoints[i][j][2]);
+		}
+		glEnd();
+	}
+	// show control points
+	glPointSize(5.0);
+	glColor3f(1.0, 0.0, 0.0);
+	glBegin(GL_POINTS);
+	for (int i = 0; i < U_size; i++) {
+		for (int j = 0; j < V_size; j++) {
+			glVertex3f(ctlpoints[i][j][0], ctlpoints[i][j][1], ctlpoints[i][j][2]);
+		}
+	}
+	glEnd();
+	glEnable(GL_LIGHTING);
+	glPopMatrix();
 }
 
 // display
@@ -158,7 +224,7 @@ void display(void) {
 	}
 
 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	// projection
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
@@ -247,7 +313,10 @@ void display(void) {
 		jetFlame->drawParticles(fireCube);
 		glPopMatrix();
 	}
-	// end
+	// 3d surface
+
+
+	drawNurb();
 
 	//-9000, -8500, -9000
 	// skybox
@@ -335,7 +404,7 @@ void display(void) {
 // main
 int main(int argc, char* argv[]) {
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
+	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH | GLUT_STENCIL);
 	glutInitWindowPosition(0, 0);
 	glutInitWindowSize(window_width, window_height);
 	glutCreateWindow("Sky Box");
