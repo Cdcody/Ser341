@@ -55,13 +55,23 @@ GLfloat vknots[V_size + ORDER] = { 0.0, 0.0, 0.0, 0.0, 1.0, 3.0, 5.0, 5.0, 5.0, 
 GLfloat uknots[U_size + ORDER] = { 0.0, 0.0, 0.0, 0.0, 1.0, 3.0, 5.0, 5.0, 5.0, 5.0 };
 
 
+//(x < -3500 && x > -5000)
+//(z < 9500 && z > 8000)
 //camera path parameters 
 GLfloat cameraPathControlPoints[4][3] = {
-	{ -800, 0, 0 },
-	{ 0, 0, 800 },
-	{ 800,  0, 0 },
+	{ -800, 800, 0 },
+	{ 0, 0, -300 },
+	{ 800, 0, 0 },
 	{ 0, 0, -800 },
 };
+/*
+GLfloat cameraPathControlPoints[4][3] = {
+	{ -4250, 500, 10500 },
+	{ -4250, 0, 7000 },
+	{ 800, 0, 0 },
+	{ 0, 0, -800 },
+};
+*/
 
 // init
 void init() {
@@ -413,6 +423,7 @@ void display(void) {
 
 	
 	if (won) {
+		cameraMode = true;
 		glColor3f(.1, 1, .1);
 		renderBitmapString(500, window_height * .65, 0.0f, "You Win", true);
 	}

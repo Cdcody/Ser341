@@ -31,7 +31,7 @@ vector<Vec3f>* hermiteCurve(float geometry[][3], int points) {
 }
 
 vector<Vec3f>* chaikinCurve(float geometry[][3], int points) {
-	vector<Vec3f>* vec = new vector<Vec3f>(points);
+	vector<Vec3f>* vec = new vector<Vec3f>();
 
 	vec->push_back(Vec3f(geometry[0][0], geometry[0][1], geometry[0][2]));
 	for (unsigned int i = 0; i < (points - 1); ++i) {
