@@ -12,7 +12,7 @@
 vector<Vec3f>* hermiteCurve(float geometry[][3], int points) {
 	vector<Vec3f>* vec = new vector<Vec3f>(points);
 
-		for (int i = 0; i != points; ++i) {
+	for (int i = 0; i != points; ++i) {
 		float t = (float)i / (points - 1);
 		// calculate blending functions
 		float b0 = 2 * t*t*t - 3 * t*t + 1;
@@ -26,7 +26,7 @@ vector<Vec3f>* hermiteCurve(float geometry[][3], int points) {
 		// specify the point
 		vec->push_back(Vec3f(x, y, z));
 	}
-		return vec;
+	return vec;
 }
 
 vector<Vec3f>* chaikinCurve(float geometry[][3], int points) {
@@ -36,7 +36,7 @@ vector<Vec3f>* chaikinCurve(float geometry[][3], int points) {
 	for (unsigned int i = 0; i < (points - 1); ++i) {
 		// get 2 original points
 		Vec3f p0 = Vec3f(geometry[i][0], geometry[i][1], geometry[i][2]);
-			Vec3f p = Vec3f(geometry[i + 1][0], geometry[i + 1][1], geometry[i + 1][2]);
+		Vec3f p1 = Vec3f(geometry[i + 1][0], geometry[i + 1][1], geometry[i + 1][2]);
 
 		Vec3f Q;
 		Vec3f R;
