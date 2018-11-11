@@ -174,10 +174,6 @@ void display(void) {
 
 	gluLookAt(x, y, z, x + lx, y + ly, z + lz, 0.0f, 1.0f, 0.0f);
 
-	jetFlame->add();
-	jetFlame->update(calculate_frame_time());
-	jetFlame->remove();
-
 	// static rotation
 	glPushMatrix();
 	glTranslatef(0, 100, -800);
@@ -233,17 +229,24 @@ void display(void) {
 	AABB(f16);
 	glPopMatrix();
 
-	//draw fire particles 
-	glPushMatrix();
-	glTranslatef(x + lx * 20, y + ly * 20, z + lz * 20);
-	glRotatef(cameraAngle * -57.5, 0, 1, 0);
-	//glTranslatef(16, -75, 120);
-	glTranslatef(-2, -40, -70);
-	glRotatef(90, 1, 0, 0);
-	glScalef(.05, .05, .05);
-	jetFlame->drawParticles(fireCube);
-	glPopMatrix();
+	//draw fire particles if enabled
 
+	if (particles) {
+		jetFlame->add();
+		jetFlame->update(calculate_frame_time());
+		jetFlame->remove();
+
+
+		glPushMatrix();
+		glTranslatef(x + lx * 20, y + ly * 20, z + lz * 20);
+		glRotatef(cameraAngle * -57.5, 0, 1, 0);
+		//glTranslatef(16, -75, 120);
+		glTranslatef(-2, -40, -70);
+		glRotatef(90, 1, 0, 0);
+		glScalef(.1, .1, .1);
+		jetFlame->drawParticles(fireCube);
+		glPopMatrix();
+	}
 	// end
 
 	//-9000, -8500, -9000

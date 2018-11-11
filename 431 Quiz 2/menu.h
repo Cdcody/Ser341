@@ -7,7 +7,7 @@
 
 
 bool shading = false;
-
+bool particles = true;
 
 
 
@@ -38,6 +38,19 @@ void shadingListener(int option) {
 	glutPostRedisplay();
 }
 
+
+void particleListener(int option) {
+	switch (option) {
+	case 1:
+		particles = false;
+		break;
+	case 2:
+		particles = true;
+		break;
+	}
+	glutPostRedisplay();
+}
+
 // create menu
 void createMenus() {
 	// add entries to speed
@@ -51,10 +64,15 @@ void createMenus() {
 	glutAddMenuEntry("smooth", 1);
 	glutAddMenuEntry("flat", 2);
 
+	int particleMenu = glutCreateMenu(particleListener);
+	glutAddMenuEntry("particles off", 1);
+	glutAddMenuEntry("particles on", 2);
+
 	// create main menu
 	int menu = glutCreateMenu(speedListener);
 	glutAddSubMenu("Speed", speedMenu);
 	glutAddSubMenu("Shading", shadingMenu);
+	glutAddSubMenu("Particles", particleMenu);
 	// attach the menu to the right button
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
