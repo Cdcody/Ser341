@@ -21,7 +21,7 @@ float y_angle = 0.0;
 float cameraAngle = 0;
 int width = 1200;
 int height = 600;
-int speed = 0;
+int speed = 1;
 int skyX = -18000;
 int skyY = -17000;
 int skyZ = -18000;
@@ -33,7 +33,7 @@ float clockSpeed = 1;
 float turning = 0;
 
 vector<Vec3f>* cameraVec;
-bool cameraMode = false;
+bool cameraMode = true;
 int cameraFrame = 0;
 int cameraX, cameraY, cameraZ;
 
@@ -176,8 +176,8 @@ void myIdle() {
 	if (cameraMode) {
 		if (/*t == 2 &&*/ cameraFrame < 1000) {
 			cameraX = (*cameraVec)[cameraFrame].x;
-		cameraY = (*cameraVec)[cameraFrame].x;
-		cameraZ = (*cameraVec)[cameraFrame].x;
+		cameraY = (*cameraVec)[cameraFrame].y;
+		cameraZ = (*cameraVec)[cameraFrame].z;
 		cameraFrame++;
 		//t = 0;
 		}
@@ -188,6 +188,8 @@ void myIdle() {
 		//cameraZ = temp[cameraFrame].z;
 		//cameraFrame++;
 	}
+	if (cameraFrame == 1000)
+		cameraMode = false;
 	
 	glutPostRedisplay();
 }
