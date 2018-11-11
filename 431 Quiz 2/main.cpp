@@ -72,12 +72,21 @@ GLfloat boxPathControlPoints[4][3] = {
 
 
 
+//object path parameters
+GLfloat objectPathControlPoints[4][3] = {
+	{ 400, 0,  -800},
+	{ 40, 0, 0 },
+	{ 800,  0, 0 },
+	{ 300, -400, -800 },
+};
+
 // init
 void init() {
 	init_frame_timer();
 	createMenus();
 
 	cameraVec = hermiteCurve(cameraPathControlPoints, 1000);
+	objectVec = hermiteCurve(objectPathControlPoints, 1000);
 	boxVec = hermiteCurve(boxPathControlPoints, 1000);
 
 	window_ratio = window_height / window_width;
@@ -174,6 +183,7 @@ void init() {
 	glEnable(GL_AUTO_NORMAL);
 	glEnable(GL_NORMALIZE);
 	glEnable(GL_AUTO_NORMAL);
+	glEnable(GL_POINT_SMOOTH);
 
 	start = std::clock();
 }
@@ -359,6 +369,16 @@ void display(void) {
 		glPopMatrix();
 	}
 
+	//object moving on curve
+
+
+	glPushMatrix();
+	Vec3f temp = (*objectVec)[objectPosition];
+	glTranslatef(temp.x - 1400, temp.y, temp.z - 1500);
+	glScalef(2, 2, 2);
+
+	glCallList(woodBox);
+	glPopMatrix();
 
 	// 3d surface
 	jademat();

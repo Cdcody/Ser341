@@ -46,6 +46,14 @@ bool cameraMode = true;
 int cameraFrame = 0;
 int cameraX, cameraY, cameraZ;
 
+vector<Vec3f>* objectVec;//stores path of object moving along a curve
+int objectPosition = 0;
+bool objectReverse = false;
+
+// camera
+//float camera_x = 0.0;
+//float camera_y = 300.0;
+//float camera_z = 320.0;
 
 
 float total_moving_angle = 0.0;
@@ -180,6 +188,16 @@ void myIdle() {
 		//t = 0;
 	}
 	
+	if (!objectReverse) {
+		objectPosition++;
+
+		objectReverse = (objectPosition == 999);
+	}
+	else {
+		objectPosition--;
+
+		objectReverse = (!objectPosition == 0);
+	}
 
 	if (cameraMode) {
 		if (/*t == 2 &&*/ cameraFrame < 1000) {
@@ -194,7 +212,6 @@ void myIdle() {
 	}
 	if (cameraFrame == 1000)
 		cameraMode = false;
-
 	
 	glutPostRedisplay();
 }
