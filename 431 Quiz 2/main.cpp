@@ -11,6 +11,7 @@
 #include "texture.h"
 #include "render.h"
 #include "controls.h"
+#include "curves.h"
 #include "material.h"
 #include "menu.h"
 #include "particles.h"
@@ -31,7 +32,7 @@ std::clock_t start;
 int timer = 0;
 float particleTimer = 0;
 
-bool won;
+//bool won;
 
 int staticAngle, angle1, angle2;
 
@@ -172,7 +173,36 @@ void display(void) {
 	// lookAt
 	// gluLookAt(0.0f, 40.0f, 320.0,	0.0f, 1.0f, -1.0f,		0.0f, 1.0f, 0.0f);
 
+
+
+
+	//**********************************************************************************************camera curve begin
 	gluLookAt(x, y, z, x + lx, y + ly, z + lz, 0.0f, 1.0f, 0.0f);
+
+
+	GLfloat ctlpoints[4][3] = {
+		{ -800, 0, 0 },
+		{ 0, 0, 800 },
+		{ 800,  0, 0 },
+		{ 0, 0, -800 },
+	};
+
+	glPointSize(10);
+	glColor3f(1, 0, 0);
+	glBegin(GL_POINTS);
+	glPointSize(10);
+	for (int i = 0; i != 4; ++i) {
+		glVertex3fv(ctlpoints[i]);
+	}
+	glEnd();
+
+	cameraVec = hermiteCurve(ctlpoints, 100);
+	
+	//**********************************************************************************************camera curve end
+
+
+
+
 
 	// static rotation
 	glPushMatrix();
@@ -346,6 +376,7 @@ int main(int argc, char* argv[]) {
 	glutMotionFunc(motion);
 	glutMouseFunc(mouse);
 
+	
 	//glutSpecialFunc(specialkeys);
 	glutSpecialFunc(mySpecial);
 	glutKeyboardFunc(callbackKeyboard);

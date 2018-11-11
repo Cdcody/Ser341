@@ -25,9 +25,14 @@ int speed = 0;
 int skyX = -18000;
 int skyY = -17000;
 int skyZ = -18000;
+bool won;
 
+
+int t;
 float clockSpeed = 1;
 float turning = 0;
+
+vector<Vec3f>* cameraVec;
 
 // camera
 //float camera_x = 0.0;
@@ -54,6 +59,11 @@ void callbackKeyboard(unsigned char key, int x, int y) {
 	case 's': case 'S':
 		if (speed > -200)
 			speed -= (1);
+		break;
+	case 'g': case 'G':
+		x = (*cameraVec)[0].x;
+		y = (*cameraVec)[0].y;
+		z = (*cameraVec)[0].z;
 		break;
 	case ' ':
 		speed = (0);
@@ -138,10 +148,8 @@ void mySpecial(int key, int x, int y) {
 	glutPostRedisplay();
 
 }
-
-//*/
+int i = 0;
 void myIdle() {
-
 	skyX = x - 18000;
 	skyY = y - 18000;
 	skyZ = z - 18000;
@@ -149,4 +157,14 @@ void myIdle() {
 
 	turning += .1 * clockSpeed;
 	glutPostRedisplay();
+
+	//if (t == 100) {
+	//		x = (*cameraVec)[i].x;
+	//		y = (*cameraVec)[i].y;
+	//		z = (*cameraVec)[i].z;
+	//	t = 0;
+	//}
+	//t++;
+	//i++;
+		
 }
