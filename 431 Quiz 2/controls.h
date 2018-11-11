@@ -27,24 +27,26 @@ int skyY = -17000;
 int skyZ = -18000;
 bool won;
 
+//box parameters
+vector<Vec3f>* boxVec;
+int boxFrame = 0;
+float boxX = 0;
+float boxY = 100;
+float boxZ = -800;
+
 
 int t = 0;
 float clockSpeed = 1;
 float turning = 0;
 
+
+//camera parameters
 vector<Vec3f>* cameraVec;
 bool cameraMode = true;
 int cameraFrame = 0;
 int cameraX, cameraY, cameraZ;
 
-// camera
-//float camera_x = 0.0;
-//float camera_y = 300.0;
-//float camera_z = 320.0;
 
-//float camera_viewing_x = 0.0;
-//float camera_viewing_y = 301.0;
-//float camera_viewing_z = 0.0;
 
 float total_moving_angle = 0.0;
 
@@ -157,6 +159,26 @@ void myIdle() {
 	moveMeFlat(speed * clockSpeed);
 
 	turning += .1 * clockSpeed;
+	int boxTurn = 1;
+	//box curve
+	if (boxTurn == 1) {
+		boxX = (*boxVec)[boxFrame].x;
+		boxY = (*boxVec)[boxFrame].y;
+		boxZ = (*boxVec)[boxFrame].z;
+		boxFrame++;
+		if (boxFrame == 999)
+			boxTurn = 0;
+		//t = 0;
+	}
+	if (boxTurn == 0) {
+		boxX = (*boxVec)[boxFrame].x;
+		boxY = (*boxVec)[boxFrame].y;
+		boxZ = (*boxVec)[boxFrame].z;
+		boxFrame--;
+		if (boxFrame == 1)
+			boxTurn = 1;
+		//t = 0;
+	}
 	
 
 	if (cameraMode) {
@@ -167,12 +189,8 @@ void myIdle() {
 		cameraFrame++;
 		//t = 0;
 		}
-		t++;
-		//vector<Vec3f> temp = *cameraVec;
-		//cameraX = temp[cameraFrame].x;
-		//cameraY = temp[cameraFrame].y;
-		//cameraZ = temp[cameraFrame].z;
-		//cameraFrame++;
+		//t++;
+		
 	}
 	if (cameraFrame == 1000)
 		cameraMode = false;

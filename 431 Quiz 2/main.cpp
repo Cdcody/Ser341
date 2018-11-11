@@ -52,8 +52,7 @@ GLfloat vknots[V_size + ORDER] = { 0.0, 0.0, 0.0, 0.0, 1.0, 3.0, 5.0, 5.0, 5.0, 
 GLfloat uknots[U_size + ORDER] = { 0.0, 0.0, 0.0, 0.0, 1.0, 3.0, 5.0, 5.0, 5.0, 5.0 };
 
 
-//(x < -3500 && x > -5000)
-//(z < 9500 && z > 8000)
+
 //camera path parameters 
 GLfloat cameraPathControlPoints[4][3] = {
 	{ -800, 800, 0 },
@@ -61,14 +60,17 @@ GLfloat cameraPathControlPoints[4][3] = {
 	{ 800, 0, 0 },
 	{ 0, 0, -800 },
 };
-/*
-GLfloat cameraPathControlPoints[4][3] = {
-	{ -4250, 500, 10500 },
-	{ -4250, 0, 7000 },
-	{ 800, 0, 0 },
-	{ 0, 0, -800 },
+
+//box path parameters
+GLfloat boxPathControlPoints[4][3] = {
+	{ 500, 100, -800 },
+	{ -500, 100, -800 },
+	{ 500, 300, -1000 },
+	{ -500, 300, -1000 },
 };
-*/
+
+
+
 
 // init
 void init() {
@@ -76,6 +78,7 @@ void init() {
 	createMenus();
 
 	cameraVec = hermiteCurve(cameraPathControlPoints, 1000);
+	boxVec = hermiteCurve(boxPathControlPoints, 1000);
 
 	window_ratio = window_height / window_width;
 	// mesh
@@ -291,7 +294,7 @@ void display(void) {
 
 	// stationary box 1
 	glPushMatrix();
-		glTranslatef(0, 100, -800);
+		glTranslatef(boxX, boxY, boxZ);
 		glCallList(metalBox);
 
 	
@@ -331,7 +334,7 @@ void display(void) {
 	glPushMatrix();
 	glTranslatef(x + lx * 20, y + ly * 20 , z + lz * 20);
 	glRotatef(cameraAngle * -57.5 + 180, 0, 1, 0);
-	glTranslatef(16, -75, 120);
+	glTranslatef(16, -62, 120);//y was -75
 	glScalef(10, 10, 10);
 	glCallList(f16List);
 	AABB(f16);
@@ -349,7 +352,7 @@ void display(void) {
 		glTranslatef(x + lx * 20, y + ly * 20, z + lz * 20);
 		glRotatef(cameraAngle * -57.5, 0, 1, 0);
 		//glTranslatef(16, -75, 120);
-		glTranslatef(-2, -40, -70);
+		glTranslatef(-2, -25, -70);//y was -40
 		glRotatef(90, 1, 0, 0);
 		glScalef(.1, .1, .1);
 		jetFlame->drawParticles(fireCube);
