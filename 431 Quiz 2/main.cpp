@@ -1,7 +1,4 @@
-/**
- * SER 431
- * https://speakerdeck.com/javiergs/ser431-lecture-04
- **/
+//Chris Cody and Justin V.
 
 #include <stdlib.h>
 #include <ctime>
