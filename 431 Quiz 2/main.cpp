@@ -345,10 +345,16 @@ void display(void) {
 		jetFlame->drawParticles(fireCube);
 		glPopMatrix();
 	}
+
+
 	// 3d surface
-
-
+	jademat();
+	glPushMatrix();
+	glTranslatef(-300, -1300, -3000);
+	glScalef(40, 40, 40);
 	drawNurb();
+	glPopMatrix();
+	defaultmat();
 
 	//-9000, -8500, -9000
 	// skybox
