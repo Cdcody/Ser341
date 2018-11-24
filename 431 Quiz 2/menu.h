@@ -8,6 +8,7 @@
 
 bool shading = false;
 bool particles = true;
+bool bounding = false;
 
 
 
@@ -51,6 +52,18 @@ void particleListener(int option) {
 	glutPostRedisplay();
 }
 
+void boundingListener(int option) {
+	switch (option) {
+	case 1:
+		bounding = false;
+		break;
+	case 2:
+		bounding = true;
+		break;
+	}
+	glutPostRedisplay();
+}
+
 // create menu
 void createMenus() {
 	// add entries to speed
@@ -68,11 +81,16 @@ void createMenus() {
 	glutAddMenuEntry("particles off", 1);
 	glutAddMenuEntry("particles on", 2);
 
+	int boundingMenu = glutCreateMenu(boundingListener);
+	glutAddMenuEntry("bounding boxes off", 1);
+	glutAddMenuEntry("bounding boxes on", 2);
+
 	// create main menu
 	int menu = glutCreateMenu(speedListener);
 	glutAddSubMenu("Speed", speedMenu);
 	glutAddSubMenu("Shading", shadingMenu);
 	glutAddSubMenu("Particles", particleMenu);
+	glutAddSubMenu("Bounding boxes", boundingMenu);
 	// attach the menu to the right button
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
 }

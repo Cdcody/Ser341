@@ -9,25 +9,31 @@
 #include <GL/glut.h>
 #include "mesh.h"
 
+Vec3f hermitePoint(float geometry[][3], float t);
+
+
 vector<Vec3f>* hermiteCurve(float geometry[][3], int points) {
 	vector<Vec3f>* vec = new vector<Vec3f>();
 
 	for (int i = 0; i != points; ++i) {
 		float t = (float)i / (points - 1);
-		// calculate blending functions
-		float b0 = 2 * t*t*t - 3 * t*t + 1;
-		float b1 = -2 * t*t*t + 3 * t*t;
-		float b2 = t * t*t - 2 * t*t + t;
-		float b3 = t * t*t - t * t;
-		// calculate the x, y and z of the curve point
-		float x = b0 * geometry[0][0] + b1 * geometry[1][0] + b2 * geometry[2][0] + b3 * geometry[3][0];
-		float y = b0 * geometry[0][1] + b1 * geometry[1][1] + b2 * geometry[2][1] + b3 * geometry[3][1];
-		float z = b0 * geometry[0][2] + b1 * geometry[1][2] + b2 * geometry[2][2] + b3 * geometry[3][2];
-		// specify the point
-		Vec3f temp = Vec3f(x, y, z);
-		vec->push_back(temp);
+		vec->push_back(hermitePoint(geometry, t));
 	}
 	return vec;
+}
+
+Vec3f hermitePoint(float geometry[][3], float t) {
+	// calculate blending functions
+	float b0 = 2 * t*t*t - 3 * t*t + 1;
+	float b1 = -2 * t*t*t + 3 * t*t;
+	float b2 = t * t*t - 2 * t*t + t;
+	float b3 = t * t*t - t * t;
+	// calculate the x, y and z of the curve point
+	float x = b0 * geometry[0][0] + b1 * geometry[1][0] + b2 * geometry[2][0] + b3 * geometry[3][0];
+	float y = b0 * geometry[0][1] + b1 * geometry[1][1] + b2 * geometry[2][1] + b3 * geometry[3][1];
+	float z = b0 * geometry[0][2] + b1 * geometry[1][2] + b2 * geometry[2][2] + b3 * geometry[3][2];
+	// specify the point
+	return Vec3f(x, y, z);
 }
 
 vector<Vec3f>* chaikinCurve(float geometry[][3], int points) {
@@ -56,3 +62,4 @@ vector<Vec3f>* chaikinCurve(float geometry[][3], int points) {
 
 	return vec;
 }
+

@@ -14,6 +14,7 @@
 #include "particles.h"
 #include "timer.h"
 #include "curves.h"
+#include "collision.h"
 
 #define terrainSamples 100 
 
@@ -347,7 +348,9 @@ void display(void) {
 	glTranslatef(16, -62, 120);//y was -75
 	glScalef(10, 10, 10);
 	glCallList(f16List);
-	AABB(f16);
+	if (bounding) {
+		AABB(f16);
+	}
 	glPopMatrix();
 
 	//draw fire particles if enabled
