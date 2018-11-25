@@ -348,6 +348,7 @@ void display(void) {
 	glTranslatef(16, -62, 120);//y was -75
 	glScalef(10, 10, 10);
 	glCallList(f16List);
+
 	if (bounding) {
 		AABB(f16);
 	}
