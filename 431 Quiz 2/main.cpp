@@ -182,6 +182,15 @@ void init() {
 	glEnable(GL_AUTO_NORMAL);
 	glEnable(GL_POINT_SMOOTH);
 
+
+	glFogi(GL_FOG_MODE, GL_LINEAR);
+	float fogColor[] = { .7, .7, .7, .4 };
+	glFogfv(GL_FOG_COLOR, fogColor );
+	glFogf(GL_FOG_DENSITY, .05);
+
+	glFogf(GL_FOG_START, 4000);
+	glFogf(GL_FOG_END, 18000);
+
 	start = std::clock();
 }
 
@@ -252,6 +261,12 @@ void display(void) {
 
 
 	// configuration
+	if (fog) {
+		glEnable(GL_FOG);
+	}
+	else {
+		glDisable(GL_FOG);
+	}
 	if (shading) {
 		glShadeModel(GL_FLAT);
 	}
