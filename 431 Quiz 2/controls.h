@@ -204,7 +204,7 @@ void myIdle() {
 			cameraX = (*cameraVec)[cameraFrame].x;
 		cameraY = (*cameraVec)[cameraFrame].y;
 		cameraZ = (*cameraVec)[cameraFrame].z;
-		cameraFrame++;
+		cameraFrame += 2;
 		//t = 0;
 		}
 		//t++;

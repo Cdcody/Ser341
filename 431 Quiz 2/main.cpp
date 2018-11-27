@@ -20,8 +20,9 @@
 
 
  // global
-Mesh *floorPlane, *cubeMesh, *skybox, *mountains, *f16;
-GLuint brickFloor, metalFloor, metalBox, woodBox, marbleBox, skyBox, terrain, f16List, fireCube;
+Mesh *floorPlane, *cubeMesh, *skybox, *terrainMesh, *f16;
+GLuint brickFloor, metalFloor, metalBox, woodBox, marbleBox, skyBox, grassyTerrain, f16List, fireCube,
+plainFloor, plainCube, plainTerrain;
 GLUnurbsObj *theNurb;
 GLuint textures[10];
 
@@ -115,7 +116,7 @@ void init() {
 			points[i][j] = noise->perlinMultiscale(i, j);
 		}
 	}
-	mountains = createTerrain(100, points);
+	terrainMesh = createTerrain(100, points);
 
 
 
@@ -146,23 +147,18 @@ void init() {
 
 
 	// display lists
+	plainFloor = meshToDisplayList(floorPlane, 1, NULL);
 	brickFloor = meshToDisplayList(floorPlane, 1, textures[0]);
 	metalBox = meshToDisplayList(cubeMesh, 2, textures[5]);
 	woodBox = meshToDisplayList(cubeMesh, 3, textures[1]);
 	marbleBox = meshToDisplayList(cubeMesh, 4, textures[3]);
 	fireCube = meshToDisplayList(cubeMesh, 8, textures[7]);
+	plainCube = meshToDisplayList(cubeMesh, 8, NULL);
 	skyBox = meshToDisplayList(skybox, 5, textures[4]);
-	terrain = meshToDisplayList(mountains, 6, textures[6]);
+	plainTerrain = meshToDisplayList(terrainMesh, 6, NULL);
+	grassyTerrain = meshToDisplayList(terrainMesh, 6, textures[6]);
 	f16List = meshToDisplayList(f16, 7, textures[5]);
 	metalFloor = meshToDisplayList(floorPlane, 1, textures[5]);
-
-	// configuration
-	if (shading) {
-		glShadeModel(GL_FLAT);
-	}
-	else {
-		glShadeModel(GL_SMOOTH);
-	}
 	
 	glEnable(GL_DEPTH_TEST);
 
@@ -188,7 +184,6 @@ void init() {
 
 	start = std::clock();
 }
-
 
 void reshape(int w, int h) {
 	window_width = w;
@@ -256,6 +251,30 @@ void display(void) {
 	}
 
 
+	// configuration
+	if (shading) {
+		glShadeModel(GL_FLAT);
+	}
+	else {
+		glShadeModel(GL_SMOOTH);
+	}
+
+	if (light) {
+		glEnable(GL_LIGHT0);
+		glEnable(GL_LIGHT1);
+		glEnable(GL_LIGHTING);
+	}
+	else {
+		glDisable(GL_LIGHT0);
+		glDisable(GL_LIGHT1);
+		glDisable(GL_LIGHTING);
+	}
+
+	if (fog) {
+
+	}
+
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	// projection
 	glMatrixMode(GL_PROJECTION);
@@ -270,9 +289,6 @@ void display(void) {
 	// lookAt
 	// gluLookAt(0.0f, 40.0f, 320.0,	0.0f, 1.0f, -1.0f,		0.0f, 1.0f, 0.0f);
 
-
-
-
 	//**********************************************************************************************camera curve begin
 	if (!cameraMode) {
 		gluLookAt(x, y, z, x + lx, y + ly, z + lz, 0.0f, 1.0f, 0.0f);
@@ -282,47 +298,31 @@ void display(void) {
 	}
 
 
-	glPointSize(50);
-	glColor3f(1, 0, 0);
-	glBegin(GL_POINTS);
-	glPointSize(10);
-	for (int i = 0; i != 4; ++i) {
-		glVertex3fv(cameraPathControlPoints[i]);
-	}
-	glEnd();	
-	//**********************************************************************************************camera curve end
-
-
-
-
-
 	// static rotation
 	glPushMatrix();
 	glTranslatef(0, 100, -800);
 	glTranslatef(150 * cos(turning / 10), 0.0, 150 * sin(turning / 10));
-	glCallList(woodBox);
+	imageTextures? glCallList(woodBox) : glCallList(plainCube);
 	glPopMatrix();
 
 	// stationary box 1
 	glPushMatrix();
 		glTranslatef(boxX, boxY, boxZ);
-		glCallList(metalBox);
-
+		imageTextures ? glCallList(metalBox) : glCallList(plainCube);
 	
 		// primary orbit around box 1
 		glPushMatrix();
 			glRotatef(turning, 0, 0, 1);
 			glTranslatef(300, 0, 0);
-			glCallList(marbleBox);
+			proceduralTextures ? glCallList(marbleBox) : glCallList(plainCube);
 
 			// moon/mini box in secondary orbit
 			glPushMatrix();
 				glRotatef(turning * 3, 0, 1, 0);
 				glTranslatef(100, 0, 0);
 				glScalef(.2, .2, .2);
-				glCallList(marbleBox);
+				proceduralTextures ? glCallList(marbleBox) : glCallList(plainCube);
 			glPopMatrix();
-
 		glPopMatrix();
 	glPopMatrix();
 
@@ -331,17 +331,24 @@ void display(void) {
 	glPushMatrix();
 	glTranslatef(-750, -700, -900);
 	glScalef(.75, 1, .75);
-	glCallList(brickFloor);
+	if (materials)
+		plasticmat();
+	imageTextures ? glCallList(brickFloor) : glCallList(plainFloor);
 	glPopMatrix();
 
 	glPushMatrix();
 	glTranslatef(-5000, -600, 8000);
 	glScalef(.75, 1, .75);
-	glCallList(metalFloor);
+	if (materials)
+		chromemat();
+	imageTextures ? glCallList(metalFloor) : glCallList(plainFloor);
 	glPopMatrix();
 
 
 	//draws airplane and its bounding box
+	if (materials)
+		chromemat();
+
 	glPushMatrix();
 	glTranslatef(x + lx * 20, y + ly * 20 , z + lz * 20);
 	glRotatef(cameraAngle * -57.5 + 180, 0, 1, 0);
@@ -380,17 +387,19 @@ void display(void) {
 	Vec3f temp = (*objectVec)[objectPosition];
 	glTranslatef(temp.x - 1400, temp.y, temp.z - 1500);
 	glScalef(2, 2, 2);
-
-	glCallList(woodBox);
+	imageTextures ? glCallList(woodBox) : glCallList(plainCube);
 	glPopMatrix();
 
 	// 3d surface
-	jademat();
+	if(materials)
+		jademat();
+
 	glPushMatrix();
 	glTranslatef(-300, -1300, -3000);
 	glScalef(40, 40, 40);
 	drawNurb();
 	glPopMatrix();
+
 	defaultmat();
 
 	//-9000, -8500, -9000
@@ -413,7 +422,16 @@ void display(void) {
 	
 	glTranslatef(-12000, 300, -12000);
 	glScalef(300, 1200, 300);
-	glCallList(terrain);
+	if (materials) {
+		emeraldmat();
+	}
+
+	if (imageTextures) {
+		glCallList(grassyTerrain);
+	}
+	else {
+		glCallList(plainTerrain);
+	}
 	glPopMatrix();
 
 	// end
