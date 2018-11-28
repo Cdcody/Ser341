@@ -20,9 +20,9 @@
 
 
  // global
-Mesh *floorPlane, *cubeMesh, *skybox, *terrainMesh, *f16;
+Mesh *floorPlane, *floorPlane2, *cubeMesh, *skybox, *terrainMesh, *f16;
 GLuint brickFloor, metalFloor, metalBox, woodBox, marbleBox, skyBox, grassyTerrain, f16List, fireCube,
-plainFloor, plainCube, plainTerrain;
+plainFloor, plainCube, plainTerrain, grassyFloor;
 GLUnurbsObj *theNurb;
 GLuint textures[10];
 
@@ -93,7 +93,8 @@ void init() {
 
 	window_ratio = window_height / window_width;
 	// mesh
-	floorPlane = createPlane(2000, 2000, 200);
+	floorPlane = createPlane(2000, 2000, 150);
+	floorPlane2 = createPlane(2000, 2000, 10);
 	cubeMesh = createCube();
 	skybox = createSkyBox(6000);
 
@@ -149,16 +150,21 @@ void init() {
 	// display lists
 	plainFloor = meshToDisplayList(floorPlane, 1, NULL);
 	brickFloor = meshToDisplayList(floorPlane, 1, textures[0]);
+	metalFloor = meshToDisplayList(floorPlane, 1, textures[5]);
+	grassyFloor = meshToDisplayList(floorPlane2, 1, textures[6]);
+
+	plainTerrain = meshToDisplayList(terrainMesh, 6, NULL);
+	grassyTerrain = meshToDisplayList(terrainMesh, 6, textures[6]);
+
 	metalBox = meshToDisplayList(cubeMesh, 2, textures[5]);
 	woodBox = meshToDisplayList(cubeMesh, 3, textures[1]);
 	marbleBox = meshToDisplayList(cubeMesh, 4, textures[3]);
 	fireCube = meshToDisplayList(cubeMesh, 8, textures[7]);
 	plainCube = meshToDisplayList(cubeMesh, 8, NULL);
 	skyBox = meshToDisplayList(skybox, 5, textures[4]);
-	plainTerrain = meshToDisplayList(terrainMesh, 6, NULL);
-	grassyTerrain = meshToDisplayList(terrainMesh, 6, textures[6]);
+
 	f16List = meshToDisplayList(f16, 7, textures[5]);
-	metalFloor = meshToDisplayList(floorPlane, 1, textures[5]);
+
 	
 	glEnable(GL_DEPTH_TEST);
 
@@ -184,12 +190,12 @@ void init() {
 
 
 	glFogi(GL_FOG_MODE, GL_LINEAR);
-	float fogColor[] = { .7, .7, .7, .4 };
+	float fogColor[] = { .7, .7, .7, .2 };
 	glFogfv(GL_FOG_COLOR, fogColor );
-	glFogf(GL_FOG_DENSITY, .05);
+	glFogf(GL_FOG_DENSITY, .02);
 
 	glFogf(GL_FOG_START, 4000);
-	glFogf(GL_FOG_END, 18000);
+	glFogf(GL_FOG_END, 10000);
 
 	start = std::clock();
 }
@@ -246,6 +252,7 @@ void drawNurb() {
 
 // display
 void display(void) {
+	glDisable(GL_FOG);
 	orientMe(cameraAngle);
 
 	//resets clock when in starting area
@@ -259,14 +266,7 @@ void display(void) {
 		won = true;
 	}
 
-
 	// configuration
-	if (fog) {
-		glEnable(GL_FOG);
-	}
-	else {
-		glDisable(GL_FOG);
-	}
 	if (shading) {
 		glShadeModel(GL_FLAT);
 	}
@@ -307,11 +307,22 @@ void display(void) {
 	//**********************************************************************************************camera curve begin
 	if (!cameraMode) {
 		gluLookAt(x, y, z, x + lx, y + ly, z + lz, 0.0f, 1.0f, 0.0f);
+		glPushMatrix();
+		glTranslatef(x, y, z);
 	}
 	else {
 		gluLookAt(cameraX, cameraY, cameraZ, x, y, z, 0.0f, 1.0f, 0.0f);
+		glPushMatrix();
+		glTranslatef(cameraX, cameraY, cameraZ);
 	}
-
+	//using fog here to depend on camera o
+	if (fog) {
+		glEnable(GL_FOG);
+	}
+	else {
+		glDisable(GL_FOG);
+	}
+	glPopMatrix();
 
 	// static rotation
 	glPushMatrix();
@@ -435,17 +446,29 @@ void display(void) {
 	//mountains
 	glPushMatrix();
 	
-	glTranslatef(-12000, 300, -12000);
+	glTranslatef(-12000, (multiscaleTerrain? 300 : -1000), -12000);
 	glScalef(300, 1200, 300);
 	if (materials) {
 		emeraldmat();
 	}
 
-	if (imageTextures) {
-		glCallList(grassyTerrain);
+	if (multiscaleTerrain) {
+
+		if (imageTextures) {
+			glCallList(grassyTerrain);
+		}
+		else {
+			glCallList(plainTerrain);
+		}
 	}
-	else {
-		glCallList(plainTerrain);
+
+	else if (multiscaleTerrain == false) {
+		if (imageTextures) {
+			glCallList(grassyFloor);
+		}
+		else {
+			glCallList(plainFloor);
+		}
 	}
 	glPopMatrix();
 
