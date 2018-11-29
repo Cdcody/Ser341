@@ -21,7 +21,7 @@ float y_angle = 0.0;
 float cameraAngle = 0;
 int width = 1200;
 int height = 600;
-int speed = 1;
+int speed = 2;
 int skyX = -18000;
 int skyY = -17000;
 int skyZ = -18000;
@@ -33,6 +33,10 @@ int boxFrame = 0;
 float boxX = 0;
 float boxY = 100;
 float boxZ = -800;
+
+
+float jetRotateX = 0;
+float jetRotateY = 0;
 
 
 int t = 0;
@@ -114,11 +118,12 @@ void mouse(int button, int state, int x, int y) {
 // motion
 void motion(int x, int y) {
 	if (mouse_button == GLUT_LEFT_BUTTON) {
-
 		cameraAngle += (float(x - mouse_x) / width);
-
+		
 		orientMe(cameraAngle);
 		ly -= (float(y - mouse_y) / height);
+		jetRotateX += (float(x - mouse_x) / 25.0);
+		jetRotateY += (float(y - mouse_y) / 25.0);
 	}
 	mouse_x = x;
 	mouse_y = y;
@@ -187,6 +192,14 @@ void myIdle() {
 			boxTurn = 1;
 		//t = 0;
 	}
+
+	//jet rotation
+	if (jetRotateX > 0.1)
+		jetRotateX -= 0.1;
+	else if (jetRotateX < 0)
+		jetRotateX += 0.1;
+
+
 	
 	if (!objectReverse) {
 		objectPosition++;

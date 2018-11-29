@@ -379,7 +379,10 @@ void display(void) {
 	glTranslatef(x + lx * 20, y + ly * 20 , z + lz * 20);
 	glRotatef(cameraAngle * -57.5 + 180, 0, 1, 0);
 	glTranslatef(16, -62, 120);//y was -75
+	glRotatef(jetRotateY, 1, 0, 0);
+	glRotatef(jetRotateX, 0, 0, 1);
 	glScalef(10, 10, 10);
+	
 	glCallList(f16List);
 
 	if (bounding) {
