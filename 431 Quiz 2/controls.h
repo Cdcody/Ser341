@@ -37,6 +37,7 @@ float boxZ = -800;
 
 float jetRotateX = 0;
 float jetRotateY = 0;
+float jetPosition = 0;
 
 
 int t = 0;
@@ -124,6 +125,7 @@ void motion(int x, int y) {
 		ly -= (float(y - mouse_y) / height);
 		jetRotateX += (float(x - mouse_x) / 25.0);
 		jetRotateY += (float(y - mouse_y) / 25.0);
+		jetPosition -= (float(y - mouse_y) / 15.0);
 	}
 	mouse_x = x;
 	mouse_y = y;

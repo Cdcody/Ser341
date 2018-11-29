@@ -376,6 +376,7 @@ void display(void) {
 		chromemat();
 
 	glPushMatrix();
+	glTranslatef(0, jetPosition, 0);
 	glTranslatef(x + lx * 20, y + ly * 20 , z + lz * 20);
 	glRotatef(cameraAngle * -57.5 + 180, 0, 1, 0);
 	glTranslatef(16, -62, 120);//y was -75
