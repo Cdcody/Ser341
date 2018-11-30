@@ -400,15 +400,26 @@ void display(void) {
 
 
 		glPushMatrix();
-		glTranslatef(x + lx * 20, y + ly * 20, z + lz * 20);
-		glRotatef(cameraAngle * -57.5, 0, 1, 0);
-		//glTranslatef(16, -75, 120);
-		glTranslatef(-2, -25, -70);//y was -40
-		glRotatef(90, 1, 0, 0);
-		glScalef(.1, .1, .1);
+		glTranslatef(0, jetPosition, 0);
+		glTranslatef(x + lx * 20, y + ly * 20, z + lz * 20);//translate based on plane's position
+		glRotatef(cameraAngle * -57.5, 0, 1, 0);//make flames match plane's direction
+		glTranslatef(16, -62, 0);//y was -75
+		glRotatef(jetRotateY, 1, 0, 0);
+		glRotatef(jetRotateX, 0, 0, 1);
+		glTranslatef(-2, -25, -70);//make flames originate in exhaust
+		glRotatef(90, 1, 0, 0);//emit flames backward
+		glScalef(.1, .1, .1);//make fire smaller
 		jetFlame->drawParticles(fireCube);
 		glPopMatrix();
 	}
+	/*
+	glTranslatef(0, jetPosition, 0);
+	glTranslatef(x + lx * 20, y + ly * 20 , z + lz * 20);
+	glRotatef(cameraAngle * -57.5 + 180, 0, 1, 0);
+	glTranslatef(16, -62, 120);//y was -75
+	glRotatef(jetRotateY, 1, 0, 0);
+	glRotatef(jetRotateX, 0, 0, 1);
+	*/
 
 	//object moving on curve
 

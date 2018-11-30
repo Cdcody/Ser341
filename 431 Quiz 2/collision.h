@@ -1,24 +1,44 @@
 #pragma once
 
-#include <math.h>
-#include <GL/glut.h>
+#define NOMINMAX
+
+// Include C++ headers
+#include <algorithm>
+using namespace std;
+
+// Include Windows headers
+#include <windows.h>
+#include <gdiplus.h>
+
 #include <ImathVec.h>
+#include <ImathMatrix.h>
+#include <GL/glut.h>
 #include <vector>
 #include "mesh.h"
 
 
-struct AABB {
-	Vec3f pmin;
-	Vec3f pmax;
-};
+
+using namespace Imath;
+using namespace std;
+
+typedef Vec3<float> Vec3f;
+typedef Vec2<float> Vec2f;
+
+void AABB(Mesh* m);
+void boundsToVertices(float f[6], Vec3f v[8]);
+void drawCube(float* f);
+float* findBounds(Mesh* m);
 
 
+typedef Matrix44<float> Mat4f;
+
+//finds min and max of x,y,z in xmin, xmax, ymin, ymax..... format
 float* findBounds(Mesh* m) {
 	float xmin = 0, xmax = 0,
 		ymin = 0, ymax = 0,
 		zmin = 0, zmax = 0;
 
-	for (float ii = 0; ii < m->dot_vertex.size(); ii++)
+	for (unsigned int ii = 0; ii < m->dot_vertex.size(); ii++)
 	{
 		Vec3f pofloat = m->dot_vertex[ii];
 
@@ -43,15 +63,50 @@ float* findBounds(Mesh* m) {
 	return temp;
 }
 
-//visual studio gives an error but still runs here
-struct AABB findAABB(Mesh* m) {
+//calculates AABB vertices from a mesh
+void AABBMesh(Mesh* m, Vec3f targetArray[8]) {
+	float* bounds = findBounds(m);
+	boundsToVertices(bounds, targetArray);
+}
+
+void boundsToVertices(float bounds[6], Vec3f targetArray[8]) {
+	float xmin = bounds[0];
+	float xmax = bounds[1];
+	float ymin = bounds[2];
+	float ymax = bounds[3];
+	float zmin = bounds[4];
+	float zmax = bounds[5];
+
+	targetArray[0] = Vec3f(xmin, ymin, zmin);
+	targetArray[1] = Vec3f(xmax, ymin, zmin);
+	targetArray[2] = Vec3f(xmax, ymin, zmax);
+	targetArray[3] = Vec3f(xmin, ymin, zmax);
+
+	targetArray[4] = Vec3f(xmin, ymax, zmin);
+	targetArray[5] = Vec3f(xmax, ymax, zmin);
+	targetArray[6] = Vec3f(xmax, ymax, zmax);
+	targetArray[7] = Vec3f(xmin, ymax, zmax);
+}
+
+//uses an existing AABB and recalculates it given a transormation matrix
+void recalcAABB(Vec3f aabb[8], float model[16]) {
 	float xmin = 0, xmax = 0,
 		ymin = 0, ymax = 0,
 		zmin = 0, zmax = 0;
 
-	for (float ii = 0; ii < m->dot_vertex.size(); ii++)
+	float array[4][4] = {
+		{model[0], model[1], model[2], model[3]},
+		{model[4], model[5], model[6], model[7]},
+		{model[8], model[9], model[10], model[11]},
+		{model[12], model[13], model[14], model[15]},
+	};
+
+	Mat4f matrix = Mat4f(array);
+
+	//for each vertex in the aabb
+	for (int ii = 0; ii < 8; ii++)
 	{
-		Vec3f pofloat = m->dot_vertex[ii];
+		Vec3f pofloat = aabb[ii] * matrix;
 
 		if (pofloat.x > xmax) xmax = pofloat.x;
 		else if (pofloat.x < xmin) xmin = pofloat.x;
@@ -62,14 +117,6 @@ struct AABB findAABB(Mesh* m) {
 		if (pofloat.z > zmax) zmax = pofloat.z;
 		else if (pofloat.z < zmin) zmin = pofloat.z;
 	}
-
-	Vec3f pmin = Vec3f(xmin, ymin, zmin);
-	Vec3f pmax = Vec3f(xmax, ymax, zmax);
-
-	struct AABB bound;
-	bound.pmin = pmin;
-	bound.pmax = pmax;
-	return bound;
 }
 
 //takes the min and max x y and z coordinates and draws lines representing a bounding box
