@@ -6,14 +6,14 @@ public:
 	GLUquadric* quad;
 	Mesh* mesh;
 	GLuint displayList;
-	Vec3f centerPoint;//center position of mesh
-	float radius;//maximum radius of mesh
+	Vec3f position;
 	float scale;//scale multiplier
+	boolean colliding = false;
 
 	GameObject(Mesh* mesh, float scale) {
 		this->mesh = mesh;
-		centerPoint = findCenter(mesh);
-		radius = findRadius(mesh, centerPoint);
+		modelCenter = findCenter(mesh);
+		radius = findRadius(mesh, modelCenter);
 		this->scale = scale;
 		initSphere();
 	}
@@ -32,17 +32,27 @@ public:
 		glCallList(displayList);
 
 		if (bounding) {
-			glTranslatef(centerPoint.x, centerPoint.y, centerPoint.z);
+			glTranslatef(modelCenter.x, modelCenter.y, modelCenter.z);
+			glDisable(GL_LIGHTING);
+			if (colliding) {
+				glColor3f(1, 0, 0);
+			}
 			gluSphere(quad, radius, 15, 15);
+			glEnable(GL_LIGHTING);
 		}
 		glPopMatrix();
 	}
 
 	//checks if 2 bounding spheres intersect
 	boolean checkCollision(GameObject* o) {
-		float distance = sqrt((this->centerPoint.x - o->centerPoint.x) * (this->centerPoint.x - o->centerPoint.x) +
-			(this->centerPoint.y - o->centerPoint.y) * (this->centerPoint.y - o->centerPoint.y) +
-			(this->centerPoint.z - o->centerPoint.z) * (this->centerPoint.z - o->centerPoint.z));
+		float distX = (this->modelCenter.x + this->position.x) - (o->modelCenter.x + o->position.x);
+		float distY = (this->modelCenter.y + this->position.y) - (o->modelCenter.y + o->position.y);
+		float distZ = (this->modelCenter.z + this->position.z) - (o->modelCenter.z + o->position.z);
+		float distance = sqrt(distX * distX + distY * distY + distZ + distZ);
 		return distance < (this->radius * this->scale + o->radius * o->scale);
 	}
+
+private:
+	Vec3f modelCenter;//center position of mesh
+	float radius;//maximum radius of mesh
 };

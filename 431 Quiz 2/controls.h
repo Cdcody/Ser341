@@ -224,18 +224,16 @@ void myIdle() {
 	}
 
 	if (cameraMode) {
-		if (/*t == 2 &&*/ cameraFrame < 1000) {
-			cameraX = (*cameraVec)[cameraFrame].x;
+		if (/*t == 2 &&*/ cameraFrame < cameraVec->size()) {
+		cameraX = (*cameraVec)[cameraFrame].x;
 		cameraY = (*cameraVec)[cameraFrame].y;
 		cameraZ = (*cameraVec)[cameraFrame].z;
 		cameraFrame += 2;
 		//t = 0;
 		}
-		//t++;
-		
+		else {
+			cameraMode = false;
+		}	
 	}
-	if (cameraFrame == 1000)
-		cameraMode = false;
-	
 	glutPostRedisplay();
 }

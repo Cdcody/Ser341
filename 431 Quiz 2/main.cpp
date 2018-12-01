@@ -16,6 +16,7 @@
 #include "curves.h"
 #include "collision.h"
 #include "gameObject.h"
+#include "fractals.h"
 
 
 #define terrainSamples 100 
@@ -62,7 +63,6 @@ GLfloat shadow_matrix[4][4];
 Vec3f floor_normal;
 vector<Vec3f> dot_vertex_floor;
 float lightAngle = 0.0, lightHeight = 500;
-int renderShadow = 1;
 
 
 // calculate floor normal
@@ -95,7 +95,7 @@ void shadowMatrix(GLfloat shadowMat[4][4], Vec3f plane_normal, GLfloat lightpos[
 	shadowMat[3][3] = dot - lightpos[3] * plane_normal[3];
 }
 
-GameObject* jet;
+GameObject* jet, *curveBox;
 
 
 
@@ -123,6 +123,7 @@ GLfloat cameraPathControlPoints[4][3] = {
 	{ 800, 0, 0 },
 	{ 0, 0, -800 },
 };
+
 
 //box path parameters
 GLfloat boxPathControlPoints[4][3] = {
@@ -168,14 +169,11 @@ GLfloat objectPathControlPoints[4][3] = {
 
 // init
 void init() {
-
-
-
-
+	CreateTreeLists();
 	init_frame_timer();
 	createMenus();
 
-	cameraVec = hermiteCurve(cameraPathControlPoints, 1000);
+	cameraVec = hermiteCurve(cameraPathControlPoints, 400);
 	objectVec = hermiteCurve(objectPathControlPoints, 1000);
 	boxVec = hermiteCurve(boxPathControlPoints, 1000);
 
@@ -188,6 +186,7 @@ void init() {
 
 	f16 = loadFile("_OBJ_files/f-16.obj");
 	jet = new GameObject(f16, 10);
+	curveBox = new GameObject(cubeMesh, 2);
 
 	ImprovedNoise* noise = new ImprovedNoise();
 
@@ -253,7 +252,9 @@ void init() {
 	skyBox = meshToDisplayList(skybox, 5, textures[4]);
 
 	f16List = meshToDisplayList(f16, 7, textures[5]);
+
 	jet->displayList = f16List;
+	curveBox->displayList = woodBox;
 	
 	//glEnable(GL_DEPTH_TEST);
 	// light
@@ -284,6 +285,8 @@ void init() {
 
 	glFogf(GL_FOG_START, 4000);
 	glFogf(GL_FOG_END, 10000);
+	
+	glCullFace(GL_BACK);
 
 	start = std::clock();
 
@@ -452,11 +455,6 @@ void display(void) {
 		glDisable(GL_LIGHTING);
 	}
 
-	if (fog) {
-
-	}
-
-
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	// projection
@@ -473,7 +471,7 @@ void display(void) {
 	// gluLookAt(0.0f, 40.0f, 320.0,	0.0f, 1.0f, -1.0f,		0.0f, 1.0f, 0.0f);
 
 
-	if (renderShadow) {
+	if (shadows) {
 		glEnable(GL_STENCIL_TEST);
 		glStencilFunc(GL_ALWAYS, 1, 0xFFFFFFFF);
 		glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
@@ -498,7 +496,7 @@ void display(void) {
 
 	// Shadows
 
-	if (renderShadow) {
+	if (shadows) {
 		glStencilFunc(GL_EQUAL, 1, 0xFFFFFFFF);
 		glStencilOp(GL_ZERO, GL_ZERO, GL_ZERO);
 		//glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP); 
@@ -539,7 +537,7 @@ void display(void) {
 
 	//**********************************************************************************************camera curve begin
 	if (!cameraMode) {
-		gluLookAt(x, y, z, x + lx, y + ly, z + lz, 0.0f, 1.0f, 0.0f);
+		gluLookAt(x - lx * 250, y - ly * 250, z - lz * 250, x, y, z, 0.0f, 1.0f, 0.0f);
 		glPushMatrix();
 		glTranslatef(x, y, z);
 	}
@@ -548,7 +546,7 @@ void display(void) {
 		glPushMatrix();
 		glTranslatef(cameraX, cameraY, cameraZ);
 	}
-	//using fog here to depend on camera o
+	//using fog here to depend on camera
 	if (fog) {
 		glEnable(GL_FOG);
 	}
@@ -613,19 +611,48 @@ void display(void) {
 	if (materials)
 		chromemat();
 
+	float convertedAngle = cameraAngle * -57.5 + 180;
 	glPushMatrix();
-	glTranslatef(0, jetPosition, 0);
-	glTranslatef(x + lx * 20, y + ly * 20 , z + lz * 20);
-	glRotatef(cameraAngle * -57.5 + 180, 0, 1, 0);
-	glTranslatef(16, -62, 120);//y was -75
+	//glTranslatef(0, jetPosition, 0);
+	glTranslatef(x, y, z);
+	//glTranslatef(x + lx * 20, y + ly * 20 , z + lz * 20);
+	glRotatef(convertedAngle, 0, 1, 0);
+	glTranslatef(20, -31, 15);
 	glRotatef(jetRotateY, 1, 0, 0);
-	glRotatef(jetRotateX, 0, 0, 1);
+	//glRotatef(jetRotateX, 0, 0, 1);
 	glScalef(10, 10, 10);
+
+	jet->position = Vec3f(x, y, z);
+	jet->colliding = jet->checkCollision(curveBox);
 	jet->render();
 	glPopMatrix();
-	//glCallList(f16List);
+
+	/*
+	glPushMatrix();
+	glTranslatef(x, y, z);
+	glRotatef(convertedAngle, 0, 1, 0);
+	glTranslatef(16, -62, 120);
+	glScalef(.05, .05, .05);
+	glCallList(woodBox);
+	glPopMatrix();
+	*/
+	
+	//shows jet's collision center as a small wood box
+	glPushMatrix();
+	glTranslatef(jet->position.x, jet->position.y, jet->position.z);
+	glScalef(.05, .05, .05);
+	glCallList(woodBox);
+	glPopMatrix();
 
 
+	// tree fractal
+	if (fractals) {
+		glPushMatrix();
+		glTranslatef(300, 100, 300);
+		glScalef(100, 100, 100);
+		glCallList(FULLTREE);
+		glPopMatrix();
+	}
 
 	//draw fire particles if enabled
 
@@ -648,14 +675,6 @@ void display(void) {
 		jetFlame->drawParticles(fireCube);
 		glPopMatrix();
 	}
-	/*
-	glTranslatef(0, jetPosition, 0);
-	glTranslatef(x + lx * 20, y + ly * 20 , z + lz * 20);
-	glRotatef(cameraAngle * -57.5 + 180, 0, 1, 0);
-	glTranslatef(16, -62, 120);//y was -75
-	glRotatef(jetRotateY, 1, 0, 0);
-	glRotatef(jetRotateX, 0, 0, 1);
-	*/
 
 	//object moving on curve
 
@@ -664,7 +683,9 @@ void display(void) {
 	Vec3f temp = (*objectVec)[objectPosition];
 	glTranslatef(temp.x - 1400, temp.y, temp.z - 1500);
 	glScalef(2, 2, 2);
-	imageTextures ? glCallList(woodBox) : glCallList(plainCube);
+	curveBox->position = Vec3f(temp.x - 1400, temp.y, temp.z - 1500);
+	curveBox->render();
+	//imageTextures ? glCallList(woodBox) : glCallList(plainCube);
 	glPopMatrix();
 
 	// 3d surface

@@ -8,14 +8,14 @@
 
 bool shading = false;
 bool particles = true;
-bool bounding = false;
+bool bounding = true;
 bool imageTextures = true;
 bool proceduralTextures = true;
 bool light = true;
 bool materials = true;
 bool collision = true;
 bool multiscaleTerrain = false;
-bool fog = true;
+bool fog = false;
 bool reflections = true;
 bool shadows = true;
 bool fractals = true;
@@ -203,7 +203,7 @@ void createMenus() {
 
 	int collisionMenu = glutCreateMenu(collisionListener);
 	glutAddMenuEntry("bounding volumes off", 1);
-	glutAddMenuEntry("bounding boxes on", 2);
+	glutAddMenuEntry("bounding volumes on", 2);
 	glutAddMenuEntry("collision off", 3);
 	glutAddMenuEntry("collision on", 4);
 
