@@ -132,7 +132,7 @@ void placeObstacle(GLfloat xPos, GLfloat yPos, GLfloat zPos, int speed) {
 	// stationary box 1
 	glPushMatrix();
 	glTranslatef(xPos, yPos, zPos);
-	imageTextures ? glCallList(metalBox) : glCallList(plainCube);
+	//imageTextures ? glCallList(metalBox) : glCallList(plainCube);   //this line adds the stationary box
 
 	// primary orbit around box 1
 	glPushMatrix();
