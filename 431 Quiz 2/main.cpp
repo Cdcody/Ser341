@@ -473,7 +473,10 @@ void display(void) {
 		glStencilFunc(GL_ALWAYS, 1, 0xFFFFFFFF);
 		glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
 	}
+
 	// Draw floor using blending to blend in reflection
+	
+	/*commented out temporarily
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glColor4f(1.0, 1.0, 1.0, 0.3);
@@ -486,6 +489,7 @@ void display(void) {
 	glEnable(GL_LIGHTING);
 	glPopMatrix();
 	glDisable(GL_BLEND);
+	*/
 
 	// Shadows
 
