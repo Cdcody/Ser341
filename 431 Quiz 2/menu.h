@@ -182,7 +182,7 @@ void collisionListener(int option) {
 		bounding = false;
 		break;
 	case 2:
-		bounding = false;
+		bounding = true;
 		break;
 	case 3:
 		collision = false;
@@ -216,8 +216,8 @@ void createMenus() {
 	int collisionMenu = glutCreateMenu(boundingListener);
 	glutAddMenuEntry("bounding boxes off", 1);
 	glutAddMenuEntry("bounding boxes on", 2);
-	glutAddMenuEntry("collision off", 2);
-	glutAddMenuEntry("collision off", 2);
+	glutAddMenuEntry("collision off", 3);
+	glutAddMenuEntry("collision on", 4);
 
 	int textureMenu = glutCreateMenu(textureListener);
 	glutAddMenuEntry("image textures off", 1);

@@ -9,6 +9,8 @@
 #include <vector>
 #include "noise.h"
 
+#define NOMINMAX
+
 using namespace Imath;
 using namespace std;
 

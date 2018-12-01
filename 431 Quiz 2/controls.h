@@ -200,6 +200,10 @@ void myIdle() {
 		jetRotateX -= 0.1;
 	else if (jetRotateX < 0)
 		jetRotateX += 0.1;
+	else if (jetRotateX < -50)
+		jetRotateX += 0.2;
+	else if (jetRotateX > 50)
+		jetRotateX += 0.2;
 
 
 	

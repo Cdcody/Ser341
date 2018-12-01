@@ -16,9 +16,31 @@
 #include "curves.h"
 #include "collision.h"
 
+
 #define terrainSamples 100 
 
+#define V_NUMPOINTS    4
+#define U_NUMPOINTS	   4
+#define V_NUMKNOTS    (V_NUMPOINTS + 4)
+#define U_NUMKNOTS    (U_NUMPOINTS + 4)
 
+// Knot sequences for cubic bezier surface and trims 
+GLfloat sknots[V_NUMKNOTS] = { 0., 0., 0., 0., 1., 1., 1., 1. };
+GLfloat tknots[U_NUMKNOTS] = { 0., 0., 0., 0., 1., 1., 1., 1. };
+
+// Control points for the flag. The Z values are modified to make it wave
+GLfloat ctlpoints[V_NUMPOINTS][U_NUMPOINTS][3] = {
+	{ { 0., 3., 0. },{ 1., 3., 0. },{ 2., 3., 0 },{ 3., 3., 0. } },
+	{ { 0., 2., 0. },{ 1., 2., 0. },{ 2., 2., 0 },{ 3., 2., 0. } },
+	{ { 0., 1., 0. },{ 1., 1., 0. },{ 2., 1., 0 },{ 3., 1., 0. } },
+	{ { 0., 0., 0. },{ 1., 0., 0. },{ 2., 0., 0 },{ 3., 0., 0. } }
+};
+GLUnurbsObj *nurbsflag;
+
+
+
+GLfloat lightPosition[4] = { 0, 200, 0, 0 };
+GLfloat shadow_matrix[4][4];
  // global
 Mesh *floorPlane, *floorPlane2, *cubeMesh, *skybox, *terrainMesh, *f16;
 GLuint brickFloor, metalFloor, metalBox, woodBox, marbleBox, skyBox, grassyTerrain, f16List, fireCube,
@@ -34,8 +56,32 @@ int timer = 0;
 float particleTimer = 0;
 
 //bool won;
-
 int staticAngle, angle1, angle2;
+
+
+
+// Create a matrix that will project the desired shadow
+void shadowMatrix(GLfloat shadowMat[4][4], Vec3f plane_normal, GLfloat lightpos[4]) {
+	GLfloat dot;
+	Vec3f lightpos_v; lightpos_v.x = lightpos[0]; lightpos_v.y = lightpos[1]; lightpos_v.z = lightpos[2];
+	dot = plane_normal.dot(lightpos_v);
+	shadowMat[0][0] = dot - lightpos[0] * plane_normal[0];
+	shadowMat[1][0] = 0.f - lightpos[0] * plane_normal[1];
+	shadowMat[2][0] = 0.f - lightpos[0] * plane_normal[2];
+	shadowMat[3][0] = 0.f - lightpos[0] * plane_normal[3];
+	shadowMat[0][1] = 0.f - lightpos[1] * plane_normal[0];
+	shadowMat[1][1] = dot - lightpos[1] * plane_normal[1];
+	shadowMat[2][1] = 0.f - lightpos[1] * plane_normal[2];
+	shadowMat[3][1] = 0.f - lightpos[1] * plane_normal[3];
+	shadowMat[0][2] = 0.f - lightpos[2] * plane_normal[0];
+	shadowMat[1][2] = 0.f - lightpos[2] * plane_normal[1];
+	shadowMat[2][2] = dot - lightpos[2] * plane_normal[2];
+	shadowMat[3][2] = 0.f - lightpos[2] * plane_normal[3];
+	shadowMat[0][3] = 0.f - lightpos[3] * plane_normal[0];
+	shadowMat[1][3] = 0.f - lightpos[3] * plane_normal[1];
+	shadowMat[2][3] = 0.f - lightpos[3] * plane_normal[2];
+	shadowMat[3][3] = dot - lightpos[3] * plane_normal[3];
+}
 
 
 //3d surface parameters
@@ -84,6 +130,10 @@ GLfloat objectPathControlPoints[4][3] = {
 
 // init
 void init() {
+
+
+
+
 	init_frame_timer();
 	createMenus();
 
@@ -167,7 +217,8 @@ void init() {
 
 	
 	glEnable(GL_DEPTH_TEST);
-
+	// shadow
+	glClearStencil(0);
 	// light
 	glEnable(GL_LIGHT0);
 	glEnable(GL_LIGHT1);
@@ -175,7 +226,7 @@ void init() {
 	GLfloat light_ambient[] = { 0.5, 0.5, 0.5, 1.0 };
 	GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
 	GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-	GLfloat light_position[] = { 0.0, 0.0, 1.0, 0.0 };
+	GLfloat light_position[] = { 0.0, 100.0, 1.0, 0.0 };
 	//GLfloat light_position[] = { 0.0, 0.0, 1.0, 0.0 };
 	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
@@ -198,6 +249,29 @@ void init() {
 	glFogf(GL_FOG_END, 10000);
 
 	start = std::clock();
+
+	
+}
+
+
+// draw_control_graph
+void draw_control_graph(GLfloat cpoints[V_NUMPOINTS][U_NUMPOINTS][3]) {
+	int s, t;
+	glDisable(GL_LIGHTING);
+	glColor3f(0, 0, 1);
+	glBegin(GL_LINES);
+	for (s = 0; s < V_NUMPOINTS; s++)
+		for (t = 0; t < U_NUMPOINTS - 1; t++) {
+			glVertex3fv(cpoints[s][t]);
+			glVertex3fv(cpoints[s][t + 1]);
+		}
+	for (t = 0; t < U_NUMPOINTS; t++)
+		for (s = 0; s < V_NUMPOINTS - 1; s++) {
+			glVertex3fv(cpoints[s][t]);
+			glVertex3fv(cpoints[s + 1][t]);
+		}
+	glEnd();
+	glEnable(GL_LIGHTING);
 }
 
 void reshape(int w, int h) {
@@ -250,8 +324,43 @@ void drawNurb() {
 	glPopMatrix();
 }
 
+// draw_nurb
+void draw_nurb() {
+	static GLfloat angle = 0.0;
+	int i, j;
+	// wave the flag by rotating Z coords though a sine wave
+	for (i = 1; i < 4; i++)
+		for (j = 0; j < 4; j++)
+			ctlpoints[i][j][2] = sin((GLfloat)i + angle);
+	angle += 0.1;
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glPushMatrix();
+	glTranslatef(2.5, -1.0, 0.0);
+	glScalef(1.5, 1.0, 1.0);
+	glRotatef(90, 0., 0., 1.);
+	gluBeginSurface(nurbsflag);
+	gluNurbsSurface(nurbsflag, V_NUMKNOTS, sknots, U_NUMKNOTS, tknots,
+		3 * U_NUMPOINTS, 3,
+		&ctlpoints[0][0][0], 4, 4, GL_MAP2_VERTEX_3);
+	gluEndSurface(nurbsflag);
+
+	draw_control_graph(ctlpoints);
+	glPopMatrix();
+	glutSwapBuffers();
+}
+
+
+
+
+
 // display
 void display(void) {
+
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	// Calculate Shadow matrix
+	//shadowMatrix(shadow_matrix, floor_normal, lightPosition);
+
+
 	glDisable(GL_FOG);
 	orientMe(cameraAngle);
 
@@ -403,7 +512,7 @@ void display(void) {
 		glTranslatef(0, jetPosition, 0);
 		glTranslatef(x + lx * 20, y + ly * 20, z + lz * 20);//translate based on plane's position
 		glRotatef(cameraAngle * -57.5, 0, 1, 0);//make flames match plane's direction
-		glTranslatef(16, -62, 0);//y was -75
+		glTranslatef(0, -02, 0);//y was -75
 		glRotatef(jetRotateY, 1, 0, 0);
 		glRotatef(jetRotateX, 0, 0, 1);
 		glTranslatef(-2, -25, -70);//make flames originate in exhaust
@@ -486,6 +595,8 @@ void display(void) {
 		}
 	}
 	glPopMatrix();
+	
+	
 
 	// end
 	glMatrixMode(GL_PROJECTION);
@@ -558,7 +669,6 @@ int main(int argc, char* argv[]) {
 	glutReshapeFunc(reshape);
 	glutDisplayFunc(display);
 	glutIdleFunc(myIdle);
-
 	glutMotionFunc(motion);
 	glutMouseFunc(mouse);
 
