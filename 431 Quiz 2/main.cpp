@@ -251,6 +251,12 @@ void init() {
 	start = std::clock();
 
 	
+	//flag code
+	nurbsflag = gluNewNurbsRenderer();
+	gluNurbsProperty(nurbsflag, GLU_SAMPLING_TOLERANCE, 100.0);
+	gluNurbsProperty(nurbsflag, GLU_DISPLAY_MODE, GLU_FILL); //GLU_OUTLINE_POLYGON
+
+
 }
 
 
@@ -594,9 +600,15 @@ void display(void) {
 			glCallList(plainFloor);
 		}
 	}
+	//flag code
+	/*
 	glPopMatrix();
-	
-	
+	glPushMatrix();
+	glTranslatef(0, 0, 0);
+	glScalef(15, 15, 15);
+	draw_nurb();
+	glPopMatrix();
+	*/
 
 	// end
 	glMatrixMode(GL_PROJECTION);
