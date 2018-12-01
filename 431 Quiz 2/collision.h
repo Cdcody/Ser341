@@ -68,7 +68,7 @@ void AABBMesh(Mesh* m, Vec3f targetArray[8]) {
 	delete bounds;
 }
 
-void boundsToVertices(float bounds[6], Vec3f targetArray[8]) {
+void boundsToVertices(float* bounds, Vec3f* targetArray) {
 	float xmin = bounds[0];
 	float xmax = bounds[1];
 	float ymin = bounds[2];
@@ -87,7 +87,7 @@ void boundsToVertices(float bounds[6], Vec3f targetArray[8]) {
 	targetArray[7] = Vec3f(xmin, ymax, zmax);
 }
 
-void verticesToBounds(Vec3f vertices[8], float bounds[6]) {
+void verticesToBounds(Vec3f* vertices, float* bounds) {
 	bounds[0] = vertices[0].x;
 	bounds[1] = vertices[5].x;
 
@@ -99,7 +99,7 @@ void verticesToBounds(Vec3f vertices[8], float bounds[6]) {
 }
 
 //uses an existing AABB and recalculates it given a transormation matrix
-void recalcAABB(Vec3f aabb[8], float model[16]) {
+void recalcAABB(Vec3f* aabb, float* model) {
 	float xmin = 0, xmax = 0,
 		ymin = 0, ymax = 0,
 		zmin = 0, zmax = 0;
@@ -199,6 +199,38 @@ void formatMatrix(float* model, float result[4][4]) {
 	};
 
 	result = array;
+}
+
+//calculates center of mesh by averaging coordinates
+Vec3f findCenter(Mesh* m) {
+	float sumX = 0, sumY = 0, sumZ = 0;
+
+	int size = m->dot_vertex.size();
+	for (unsigned int ii = 0; ii < size; ii++)
+	{
+		Vec3f pofloat = m->dot_vertex[ii];
+
+		sumX += pofloat.x;
+		sumY += pofloat.y;
+		sumZ += pofloat.z;
+	}
+	return Vec3f(sumX / size, sumY / size, sumZ / size);
+}
+
+//finds point with greatest radius from center
+float findRadius(Mesh* m, Vec3f center) {
+	float max = 0;
+
+	for (unsigned int ii = 0; ii < m->dot_vertex.size(); ii++)
+	{
+		Vec3f pofloat = m->dot_vertex[ii];
+
+		Vec3f dist = pofloat - center;
+		float thisRadius = sqrt(dist.x * dist.x + dist.y * dist.y + dist.z * dist.z);
+		if (thisRadius >= max)
+			max = thisRadius;
+	}
+	return max;
 }
 
 

@@ -3,27 +3,46 @@
 
 class GameObject {
 public:
+	GLUquadric* quad;
 	Mesh* mesh;
 	GLuint displayList;
-	float* bounds;
-	float matrix[16];
+	Vec3f centerPoint;//center position of mesh
+	float radius;//maximum radius of mesh
+	float scale;//scale multiplier
 
-	GameObject(Mesh* mesh) {
+	GameObject(Mesh* mesh, float scale) {
 		this->mesh = mesh;
-		calculateNormalPerFace(mesh);
-		calculateNormalPerVertex(mesh);
-		bounds = findBounds(mesh);
+		centerPoint = findCenter(mesh);
+		radius = findRadius(mesh, centerPoint);
+		this->scale = scale;
+		initSphere();
+	}
+
+	~GameObject() {
+		gluDeleteQuadric(quad);
+	}
+
+	 void initSphere() {
+		quad = gluNewQuadric();
+		gluQuadricDrawStyle(quad, GLU_LINE);
 	}
 
 	void render() {
 		glPushMatrix();
-		glMultMatrixf(matrix);
 		glCallList(displayList);
+
+		if (bounding) {
+			glTranslatef(centerPoint.x, centerPoint.y, centerPoint.z);
+			gluSphere(quad, radius, 15, 15);
+		}
 		glPopMatrix();
 	}
 
-	boolean collision(GameObject* o) {
-		
-		return false;
+	//checks if 2 bounding spheres intersect
+	boolean checkCollision(GameObject* o) {
+		float distance = sqrt((this->centerPoint.x - o->centerPoint.x) * (this->centerPoint.x - o->centerPoint.x) +
+			(this->centerPoint.y - o->centerPoint.y) * (this->centerPoint.y - o->centerPoint.y) +
+			(this->centerPoint.z - o->centerPoint.z) * (this->centerPoint.z - o->centerPoint.z));
+		return distance < (this->radius * this->scale + o->radius * o->scale);
 	}
 };

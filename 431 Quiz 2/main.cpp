@@ -15,6 +15,7 @@
 #include "timer.h"
 #include "curves.h"
 #include "collision.h"
+#include "gameObject.h"
 
 #define terrainSamples 100 
 
@@ -36,6 +37,8 @@ float particleTimer = 0;
 //bool won;
 
 int staticAngle, angle1, angle2;
+
+GameObject* jet;
 
 
 //3d surface parameters
@@ -99,6 +102,7 @@ void init() {
 	skybox = createSkyBox(6000);
 
 	f16 = loadFile("_OBJ_files/f-16.obj");
+	jet = new GameObject(f16, 10);
 
 	ImprovedNoise* noise = new ImprovedNoise();
 
@@ -164,7 +168,7 @@ void init() {
 	skyBox = meshToDisplayList(skybox, 5, textures[4]);
 
 	f16List = meshToDisplayList(f16, 7, textures[5]);
-
+	jet->displayList = f16List;
 	
 	glEnable(GL_DEPTH_TEST);
 
@@ -383,13 +387,11 @@ void display(void) {
 	glRotatef(jetRotateY, 1, 0, 0);
 	glRotatef(jetRotateX, 0, 0, 1);
 	glScalef(10, 10, 10);
-	
-	glCallList(f16List);
-
-	if (bounding) {
-		AABB(f16);
-	}
+	jet->render();
 	glPopMatrix();
+	//glCallList(f16List);
+
+
 
 	//draw fire particles if enabled
 
