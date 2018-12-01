@@ -62,18 +62,6 @@ void particleListener(int option) {
 	glutPostRedisplay();
 }
 
-void boundingListener(int option) {
-	switch (option) {
-	case 1:
-		bounding = false;
-		break;
-	case 2:
-		bounding = true;
-		break;
-	}
-	glutPostRedisplay();
-}
-
 void fogListener(int option) {
 	switch (option) {
 	case 1:
@@ -213,8 +201,8 @@ void createMenus() {
 	glutAddMenuEntry("particles off", 1);
 	glutAddMenuEntry("particles on", 2);
 
-	int collisionMenu = glutCreateMenu(boundingListener);
-	glutAddMenuEntry("bounding boxes off", 1);
+	int collisionMenu = glutCreateMenu(collisionListener);
+	glutAddMenuEntry("bounding volumes off", 1);
 	glutAddMenuEntry("bounding boxes on", 2);
 	glutAddMenuEntry("collision off", 3);
 	glutAddMenuEntry("collision on", 4);
