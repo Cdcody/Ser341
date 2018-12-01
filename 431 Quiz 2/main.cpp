@@ -128,6 +128,29 @@ GLfloat boxPathControlPoints[4][3] = {
 	{ -500, 300, -1000 },
 };
 
+void placeObstacle(GLfloat xPos, GLfloat yPos, GLfloat zPos, int speed) {
+	// stationary box 1
+	glPushMatrix();
+	glTranslatef(xPos, yPos, zPos);
+	imageTextures ? glCallList(metalBox) : glCallList(plainCube);
+
+	// primary orbit around box 1
+	glPushMatrix();
+	glRotatef(turning * speed, 0, 0, 1);
+	glTranslatef(300, 0, 0);
+	proceduralTextures ? glCallList(marbleBox) : glCallList(plainCube);
+
+	// moon/mini box in secondary orbit
+	glPushMatrix();
+	glRotatef(turning * (speed + 3), 0, 1, 0);
+	glTranslatef(100, 0, -800);
+	glScalef(.2, .2, .2);
+	proceduralTextures ? glCallList(marbleBox) : glCallList(plainCube);
+	glPopMatrix();
+	glPopMatrix();
+	glPopMatrix();
+}
+
 
 
 
@@ -479,22 +502,18 @@ void display(void) {
 		glPushMatrix();
 		// Project the shadow
 		glMultMatrixf((GLfloat *)shadow_matrix);
-		// boxes
+		// jet shadow
 		glDisable(GL_DEPTH_TEST);
 		glPushMatrix();
 		glTranslatef(0, jetPosition, 0);
-		glTranslatef(x + lx * 20, y + ly * 20, z + lz * 20);
+		glTranslatef(x + lx * 20, 0, z + lz * 20);
 		glRotatef(cameraAngle * -57.5 + 180, 0, 1, 0);
-		glTranslatef(16, -62, 120);//y was -75
+		glTranslatef(16, 0, 120);//y was -75
 		glRotatef(jetRotateY, 1, 0, 0);
 		glRotatef(jetRotateX, 0, 0, 1);
 		glScalef(10, 10, 10);
 
 		glCallList(f16List);
-
-		if (bounding) {
-			AABB(f16);
-		}
 		glPopMatrix();
 		glEnable(GL_DEPTH_TEST);
 		glPopMatrix();
@@ -550,13 +569,18 @@ void display(void) {
 			// moon/mini box in secondary orbit
 			glPushMatrix();
 				glRotatef(turning * 3, 0, 1, 0);
-				glTranslatef(100, 0, 0);
+				glTranslatef(100, 0, -800);
 				glScalef(.2, .2, .2);
 				proceduralTextures ? glCallList(marbleBox) : glCallList(plainCube);
 			glPopMatrix();
 		glPopMatrix();
 	glPopMatrix();
 
+	placeObstacle(-1500, 100, 8300, 1);
+	placeObstacle(-2500, 100, 8300,1);
+	placeObstacle(-3500, 100, 9300,1);  placeObstacle(-3500, 100, 8300, 2);  placeObstacle(-3500, 100, 7300, 3);  placeObstacle(-3500, 100, 6300, 2);
+	placeObstacle(-4500, 100, 9300,1);  placeObstacle(-4500, 100, 8300, 2);  placeObstacle(-4500, 100, 7300, 3);  placeObstacle(-4500, 100, 6300, 2);
+	placeObstacle(-5500, 100, 8300,1);
 
 	//draw start and ending areas
 	glPushMatrix();
