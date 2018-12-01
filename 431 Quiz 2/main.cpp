@@ -38,9 +38,6 @@ GLfloat ctlpoints[V_NUMPOINTS][U_NUMPOINTS][3] = {
 GLUnurbsObj *nurbsflag;
 
 
-
-GLfloat lightPosition[4] = { 0, 200, 0, 0 };
-GLfloat shadow_matrix[4][4];
  // global
 Mesh *floorPlane, *floorPlane2, *cubeMesh, *skybox, *terrainMesh, *f16;
 GLuint brickFloor, metalFloor, metalBox, woodBox, marbleBox, skyBox, grassyTerrain, f16List, fireCube,
@@ -58,7 +55,21 @@ float particleTimer = 0;
 //bool won;
 int staticAngle, angle1, angle2;
 
+// Shadows
+GLfloat light_position[4];
+GLfloat shadow_matrix[4][4];
+Vec3f floor_normal;
+vector<Vec3f> dot_vertex_floor;
+float lightAngle = 0.0, lightHeight = 500;
+int renderShadow = 1;
 
+
+// calculate floor normal
+void calculate_floor_normal(Vec3f *plane, vector<Vec3f> dot_floor) {
+	Vec3<GLfloat> AB = dot_floor[1] - dot_floor[0];
+	Vec3<GLfloat> AC = dot_floor[2] - dot_floor[0];
+	*plane = AB.cross(AC);
+}
 
 // Create a matrix that will project the desired shadow
 void shadowMatrix(GLfloat shadowMat[4][4], Vec3f plane_normal, GLfloat lightpos[4]) {
@@ -216,9 +227,7 @@ void init() {
 	f16List = meshToDisplayList(f16, 7, textures[5]);
 
 	
-	glEnable(GL_DEPTH_TEST);
-	// shadow
-	glClearStencil(0);
+	//glEnable(GL_DEPTH_TEST);
 	// light
 	glEnable(GL_LIGHT0);
 	glEnable(GL_LIGHT1);
@@ -250,7 +259,22 @@ void init() {
 
 	start = std::clock();
 
+
+	// shadow
+	glClearStencil(0);
+	// floor vertex
+	dot_vertex_floor.push_back(Vec3<GLfloat>(-2000.0, 11.0, 2000.0));
+	dot_vertex_floor.push_back(Vec3<GLfloat>(2000.0, 11.0, 2000.0));
+	dot_vertex_floor.push_back(Vec3<GLfloat>(2000.0, 11.0, -2000.0));
+	dot_vertex_floor.push_back(Vec3<GLfloat>(-2000.0, 11.0, -2000.0));
+	calculate_floor_normal(&floor_normal, dot_vertex_floor);
+	// light
 	
+
+	// STENCIL|STEP 2. NEW LINES
+	//glEnable(GL_BLEND);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glClearStencil(0); //define the value to use as clean.
 }
 
 
@@ -356,9 +380,15 @@ void draw_nurb() {
 // display
 void display(void) {
 
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	// light source position
+	light_position[0] = 500 * cos(lightAngle);
+	light_position[1] = lightHeight;
+	light_position[2] = 500 * sin(lightAngle);
+	light_position[3] = 0.0; // directional light
+	lightAngle += 0.0005;
 	// Calculate Shadow matrix
-	//shadowMatrix(shadow_matrix, floor_normal, lightPosition);
+	shadowMatrix(shadow_matrix, floor_normal, light_position);
 
 
 	glDisable(GL_FOG);
@@ -399,6 +429,7 @@ void display(void) {
 	}
 
 
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	// projection
 	glMatrixMode(GL_PROJECTION);
@@ -412,6 +443,71 @@ void display(void) {
 	glLoadIdentity();
 	// lookAt
 	// gluLookAt(0.0f, 40.0f, 320.0,	0.0f, 1.0f, -1.0f,		0.0f, 1.0f, 0.0f);
+
+
+	if (renderShadow) {
+		glEnable(GL_STENCIL_TEST);
+		glStencilFunc(GL_ALWAYS, 1, 0xFFFFFFFF);
+		glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
+	}
+	// Draw floor using blending to blend in reflection
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glColor4f(1.0, 1.0, 1.0, 0.3);
+	glPushMatrix();
+	glDisable(GL_LIGHTING);
+	//glRotatef(90, 1, 0, 0);
+	glTranslatef(-12000, (multiscaleTerrain ? 300 : -1000), -12000);
+	glScalef(300, 1200, 300);
+	glCallList(grassyFloor);
+	glEnable(GL_LIGHTING);
+	glPopMatrix();
+	glDisable(GL_BLEND);
+
+	// Shadows
+
+	if (renderShadow) {
+		glStencilFunc(GL_EQUAL, 1, 0xFFFFFFFF);
+		glStencilOp(GL_ZERO, GL_ZERO, GL_ZERO);
+		//glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP); 
+		//  To eliminate depth buffer artifacts, use glEnable(GL_POLYGON_OFFSET_FILL);
+		// Render 50% black shadow color on top of whatever the floor appareance is
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glDisable(GL_LIGHTING);  /* Force the 50% black. */
+		glColor4f(0.0, 0.0, 0.0, 0.5);
+		glPushMatrix();
+		// Project the shadow
+		glMultMatrixf((GLfloat *)shadow_matrix);
+		// boxes
+		glDisable(GL_DEPTH_TEST);
+		glPushMatrix();
+		glTranslatef(0, jetPosition, 0);
+		glTranslatef(x + lx * 20, y + ly * 20, z + lz * 20);
+		glRotatef(cameraAngle * -57.5 + 180, 0, 1, 0);
+		glTranslatef(16, -62, 120);//y was -75
+		glRotatef(jetRotateY, 1, 0, 0);
+		glRotatef(jetRotateX, 0, 0, 1);
+		glScalef(10, 10, 10);
+
+		glCallList(f16List);
+
+		if (bounding) {
+			AABB(f16);
+		}
+		glPopMatrix();
+		glEnable(GL_DEPTH_TEST);
+		glPopMatrix();
+		glDisable(GL_BLEND);
+		glEnable(GL_LIGHTING);
+		// To eliminate depth buffer artifacts, use glDisable(GL_POLYGON_OFFSET_FILL);
+		glDisable(GL_STENCIL_TEST);
+	}
+
+
+
+
+
 
 	//**********************************************************************************************camera curve begin
 	if (!cameraMode) {
