@@ -21,8 +21,6 @@ using namespace std;
 using namespace Imath;
 using namespace std;
 
-typedef Vec3<float> Vec3f;
-typedef Vec2<float> Vec2f;
 
 void AABB(Mesh* m);
 void boundsToVertices(float f[6], Vec3f v[8]);
@@ -67,6 +65,7 @@ float* findBounds(Mesh* m) {
 void AABBMesh(Mesh* m, Vec3f targetArray[8]) {
 	float* bounds = findBounds(m);
 	boundsToVertices(bounds, targetArray);
+	delete bounds;
 }
 
 void boundsToVertices(float bounds[6], Vec3f targetArray[8]) {
@@ -86,6 +85,17 @@ void boundsToVertices(float bounds[6], Vec3f targetArray[8]) {
 	targetArray[5] = Vec3f(xmax, ymax, zmin);
 	targetArray[6] = Vec3f(xmax, ymax, zmax);
 	targetArray[7] = Vec3f(xmin, ymax, zmax);
+}
+
+void verticesToBounds(Vec3f vertices[8], float bounds[6]) {
+	bounds[0] = vertices[0].x;
+	bounds[1] = vertices[5].x;
+
+	bounds[2] = vertices[0].y;
+	bounds[3] = vertices[5].y;
+
+	bounds[4] = vertices[0].z;
+	bounds[5] = vertices[5].z;
 }
 
 //uses an existing AABB and recalculates it given a transormation matrix
@@ -178,4 +188,47 @@ void AABB(Mesh* m) {
 
 	drawCube(bounds);
 	delete(bounds);
+}
+
+void formatMatrix(float* model, float result[4][4]) {
+	float array[4][4] = {
+	{model[0], model[1], model[2], model[3]},
+	{model[4], model[5], model[6], model[7]},
+	{model[8], model[9], model[10], model[11]},
+	{model[12], model[13], model[14], model[15]},
+	};
+
+	result = array;
+}
+
+
+boolean checkCollision(float* bounds1, float* bounds2) {
+	float xmin1 = bounds1[0],
+	xmax1 = bounds1[1],
+	ymin1 = bounds1[2],
+	ymax1 = bounds1[3],
+	zmin1 = bounds1[4],
+	zmax1 = bounds1[5];
+
+	float xmin2 = bounds2[0],
+	xmax2 = bounds2[1],
+	ymin2 = bounds2[2],
+	ymax2 = bounds2[3],
+	zmin2 = bounds2[4],
+	zmax2 = bounds2[5];
+
+
+	if ((xmax1 < xmin2) ||
+		(xmin1 > xmax2))
+		return false;
+
+	if ((ymax1 < ymin2) ||
+		(ymin1 > ymax2))
+		return false;
+
+	if ((zmax1 < zmin2) ||
+		(zmin1 > zmax2))
+		return false;
+
+	return true;
 }
