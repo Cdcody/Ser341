@@ -17,6 +17,7 @@
 #include "collision.h"
 #include "gameObject.h"
 #include "fractals.h"
+#include "shadows.h"
 
 
 #define terrainSamples 100 
@@ -57,43 +58,8 @@ float particleTimer = 0;
 int remaining = 10;
 int staticAngle, angle1, angle2;
 
-// Shadows
-GLfloat light_position[4];
-GLfloat shadow_matrix[4][4];
-Vec3f floor_normal;
-vector<Vec3f> dot_vertex_floor;
-float lightAngle = 0.0, lightHeight = 500;
 
 
-// calculate floor normal
-void calculate_floor_normal(Vec3f *plane, vector<Vec3f> dot_floor) {
-	Vec3<GLfloat> AB = dot_floor[1] - dot_floor[0];
-	Vec3<GLfloat> AC = dot_floor[2] - dot_floor[0];
-	*plane = AB.cross(AC);
-}
-
-// Create a matrix that will project the desired shadow
-void shadowMatrix(GLfloat shadowMat[4][4], Vec3f plane_normal, GLfloat lightpos[4]) {
-	GLfloat dot;
-	Vec3f lightpos_v; lightpos_v.x = lightpos[0]; lightpos_v.y = lightpos[1]; lightpos_v.z = lightpos[2];
-	dot = plane_normal.dot(lightpos_v);
-	shadowMat[0][0] = dot - lightpos[0] * plane_normal[0];
-	shadowMat[1][0] = 0.f - lightpos[0] * plane_normal[1];
-	shadowMat[2][0] = 0.f - lightpos[0] * plane_normal[2];
-	shadowMat[3][0] = 0.f - lightpos[0] * plane_normal[3];
-	shadowMat[0][1] = 0.f - lightpos[1] * plane_normal[0];
-	shadowMat[1][1] = dot - lightpos[1] * plane_normal[1];
-	shadowMat[2][1] = 0.f - lightpos[1] * plane_normal[2];
-	shadowMat[3][1] = 0.f - lightpos[1] * plane_normal[3];
-	shadowMat[0][2] = 0.f - lightpos[2] * plane_normal[0];
-	shadowMat[1][2] = 0.f - lightpos[2] * plane_normal[1];
-	shadowMat[2][2] = dot - lightpos[2] * plane_normal[2];
-	shadowMat[3][2] = 0.f - lightpos[2] * plane_normal[3];
-	shadowMat[0][3] = 0.f - lightpos[3] * plane_normal[0];
-	shadowMat[1][3] = 0.f - lightpos[3] * plane_normal[1];
-	shadowMat[2][3] = 0.f - lightpos[3] * plane_normal[2];
-	shadowMat[3][3] = dot - lightpos[3] * plane_normal[3];
-}
 
 GameObject* jet;
 int diamondScale = 15;
@@ -172,6 +138,45 @@ GLfloat objectPathControlPoints[4][3] = {
 
 // init
 void init() {
+
+	glShadeModel(GL_SMOOTH);
+	glEnable(GL_DEPTH_TEST);
+	// shadow
+	glClearStencil(0);
+	// floor vertex
+	dot_vertex_floor.push_back(Vec3<GLfloat>(-20000.0, 200.0, 20000.0));
+	dot_vertex_floor.push_back(Vec3<GLfloat>(20000.0, 200.0, 20000.0));
+	dot_vertex_floor.push_back(Vec3<GLfloat>(20000.0, 200.0, -20000.0));
+	dot_vertex_floor.push_back(Vec3<GLfloat>(-20000.0, 200.0, -20000.0));
+	calculate_floor_normal(&floor_normal, dot_vertex_floor);
+	// light
+	GLfloat light_ambient[] = { 0.5, 0.5, 0.5, 1.0 };
+	GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
+	GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+	glEnable(GL_LIGHT0);
+	glEnable(GL_LIGHTING);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	CreateTreeLists();
 	init_frame_timer();
 	createMenus();
@@ -271,15 +276,15 @@ void init() {
 	glEnable(GL_LIGHT0);
 	glEnable(GL_LIGHT1);
 	glEnable(GL_LIGHTING);
-	GLfloat light_ambient[] = { 0.5, 0.5, 0.5, 1.0 };
-	GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
-	GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-	GLfloat light_position[] = { 0.0, 100.0, 1.0, 0.0 };
+	//GLfloat light_ambient[] = { 0.5, 0.5, 0.5, 1.0 };
+	//GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
+	//GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+	//GLfloat light_position[] = { 0.0, 300.0, 1.0, 0.0 };
 	//GLfloat light_position[] = { 0.0, 0.0, 1.0, 0.0 };
-	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
-	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+	//glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+	//glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+	//glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+	//glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_AUTO_NORMAL);
@@ -301,21 +306,7 @@ void init() {
 	start = std::clock();
 
 
-	// shadow
-	glClearStencil(0);
-	// floor vertex
-	dot_vertex_floor.push_back(Vec3<GLfloat>(-2000.0, 11.0, 2000.0));
-	dot_vertex_floor.push_back(Vec3<GLfloat>(2000.0, 11.0, 2000.0));
-	dot_vertex_floor.push_back(Vec3<GLfloat>(2000.0, 11.0, -2000.0));
-	dot_vertex_floor.push_back(Vec3<GLfloat>(-2000.0, 11.0, -2000.0));
-	calculate_floor_normal(&floor_normal, dot_vertex_floor);
-	// light
 	
-
-	// STENCIL|STEP 2. NEW LINES
-	//glEnable(GL_BLEND);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glClearStencil(0); //define the value to use as clean.
 }
 
 
@@ -419,17 +410,125 @@ void draw_nurb() {
 
 // display
 void display(void) {
+	
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	// light source position
 	light_position[0] = 500 * cos(lightAngle);
-	light_position[1] = 1500;
+	light_position[1] = lightHeight;
 	light_position[2] = 500 * sin(lightAngle);
 	light_position[3] = 0.0; // directional light
 	lightAngle += 0.0005;
 	// Calculate Shadow matrix
 	shadowMatrix(shadow_matrix, floor_normal, light_position);
+	// projection and view
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glViewport(0, 0, width, height);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	// lookAt 
+	gluLookAt(0.0f, 40.0f, 320.0, 0.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f);
+	// camera
+	glScalef(scale, scale, scale);
+	glRotatef(x_angle, 1.0f, 0.0f, 0.0f);
+	glRotatef(y_angle, 0.0f, 1.0f, 0.0f);
+	glTranslatef(0.0f, 0.0f, 0.0f);
+	// draw
+	glPushMatrix();
+	// Tell GL new light source position
+	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+	// Shadows
+	if (renderShadow) {
+		glEnable(GL_STENCIL_TEST);
+		glStencilFunc(GL_ALWAYS, 1, 0xFFFFFFFF);
+		glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
+	}
+	// Draw floor using blending to blend in reflection
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glColor4f(1.0, 1.0, 1.0, 0.3);
+	glPushMatrix();
+	glDisable(GL_LIGHTING);
+	glPushMatrix();
 
+	glTranslatef(-12000, (multiscaleTerrain ? 300 : -1000), -12000);
+	glScalef(200, 1200, 200);
+	if (materials) {
+		emeraldmat();
+	}
+
+	if (multiscaleTerrain) {
+
+		if (imageTextures) {
+			glCallList(grassyTerrain);
+		}
+		else {
+			glCallList(plainTerrain);
+		}
+	}
+
+	else if (multiscaleTerrain == false) {
+		if (imageTextures) {
+			glCallList(grassyFloor);
+		}
+		else {
+			glCallList(plainFloor);
+		}
+	}
+	glPopMatrix();
+	glEnable(GL_LIGHTING);
+	glPopMatrix();
+	glDisable(GL_BLEND);
+	// Shadows
+
+	if (renderShadow) {
+		glStencilFunc(GL_EQUAL, 1, 0xFFFFFFFF);
+		glStencilOp(GL_ZERO, GL_ZERO, GL_ZERO);
+		//glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP); 
+		//  To eliminate depth buffer artifacts, use glEnable(GL_POLYGON_OFFSET_FILL);
+		// Render 50% black shadow color on top of whatever the floor appareance is
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glDisable(GL_LIGHTING);  /* Force the 50% black. */
+		glColor4f(0.0, 0.0, 0.0, 0.5);
+		glPushMatrix();
+			// Project the shadow
+			glMultMatrixf((GLfloat *)shadow_matrix);
+			// boxes
+			glDisable(GL_DEPTH_TEST);
+			glTranslatef(x, 0, z);
+			jet->position = Vec3f(x, 0, z);
+			jet->render();
+			GLfloat shadowRow = 18000;
+			GLfloat shadowColumn = 18000;
+			if (fractals) {
+				for (int i = 0; i < 4; i++) {
+					for (int j = 0; j < 4; j++) {
+						generateTree(shadowRow, 0, shadowColumn);
+						shadowColumn = shadowColumn - 6000;
+					}
+					shadowColumn = 18000;
+					shadowRow = shadowRow - 6000;
+				}
+			}
+			glEnable(GL_DEPTH_TEST);
+		glPopMatrix();
+		glDisable(GL_BLEND);
+		glEnable(GL_LIGHTING);
+		// To eliminate depth buffer artifacts, use glDisable(GL_POLYGON_OFFSET_FILL);
+		glDisable(GL_STENCIL_TEST);
+	}
+
+	
+	// draw the light arrow	
+	drawLightArrow();
+	glPopMatrix();
+
+
+
+	
+	
 
 	glDisable(GL_FOG);
 	orientMe(cameraAngle);
@@ -470,62 +569,16 @@ void display(void) {
 
 
 	if (shadows) {
-		glEnable(GL_STENCIL_TEST);
-		glStencilFunc(GL_ALWAYS, 1, 0xFFFFFFFF);
-		glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
+		
 	}
 
-	// Draw floor using blending to blend in reflection
+
 	
-	/*commented out temporarily
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glColor4f(1.0, 1.0, 1.0, 0.3);
-	glPushMatrix();
-	glDisable(GL_LIGHTING);
-	//glRotatef(90, 1, 0, 0);
-	glTranslatef(-12000, (multiscaleTerrain ? 300 : -1000), -12000);
-	glScalef(300, 1200, 300);
-	glCallList(grassyFloor);
-	glEnable(GL_LIGHTING);
-	glPopMatrix();
-	glDisable(GL_BLEND);
-	*/
 
 	// Shadows
 
 	if (shadows) {
-		glStencilFunc(GL_EQUAL, 1, 0xFFFFFFFF);
-		glStencilOp(GL_ZERO, GL_ZERO, GL_ZERO);
-		//glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP); 
-		//  To eliminate depth buffer artifacts, use glEnable(GL_POLYGON_OFFSET_FILL);
-		// Render 50% black shadow color on top of whatever the floor appareance is
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glDisable(GL_LIGHTING);  /* Force the 50% black. */
-		glColor4f(0.0, 0.0, 0.0, 0.5);
-		glPushMatrix();
-		// Project the shadow
-		glMultMatrixf((GLfloat *)shadow_matrix);
-		// jet shadow
-		glDisable(GL_DEPTH_TEST);
-		glPushMatrix();
-		glTranslatef(0, jetPosition, 0);
-		glTranslatef(x + lx * 20, 0, z + lz * 20);
-		glRotatef(cameraAngle * -57.5 + 180, 0, 1, 0);
-		glTranslatef(16, 0, 120);//y was -75
-		glRotatef(jetRotateY, 1, 0, 0);
-		glRotatef(jetRotateX, 0, 0, 1);
-		glScalef(10, 10, 10);
-
-		glCallList(f16List);
-		glPopMatrix();
-		glEnable(GL_DEPTH_TEST);
-		glPopMatrix();
-		glDisable(GL_BLEND);
-		glEnable(GL_LIGHTING);
-		// To eliminate depth buffer artifacts, use glDisable(GL_POLYGON_OFFSET_FILL);
-		glDisable(GL_STENCIL_TEST);
+		
 	}
 
 	//**********************************************************************************************camera curve begin
@@ -666,7 +719,7 @@ void display(void) {
 	glRotatef(jetRotateY, 1, 0, 0);
 	//glRotatef(jetRotateX, 0, 0, 1);
 	glScalef(10, 10, 10);
-
+	
 	jet->position = Vec3f(x, y, z);
 	jet->render();
 	glPopMatrix();
@@ -701,8 +754,9 @@ void display(void) {
 		jademat();
 
 	glPushMatrix();
-	glTranslatef(-300, -1300, -3000);
-	glScalef(40, 40, 40);
+	glTranslatef(8000, -100, -8000);
+	glScalef(100, 100, 100);
+	glRotatef(180, 0, 1, 0);
 	drawNurb();
 	glPopMatrix();
 
@@ -724,6 +778,7 @@ void display(void) {
 	defaultmat();
 
 	//mountains
+	
 	glPushMatrix();
 	
 	glTranslatef(-12000, (multiscaleTerrain? 300 : -1000), -12000);
@@ -864,3 +919,6 @@ int main(int argc, char* argv[]) {
 	glutMainLoop();
 	return 0;
 }
+
+
+
