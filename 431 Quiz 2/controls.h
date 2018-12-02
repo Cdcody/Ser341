@@ -21,7 +21,7 @@ float y_angle = 0.0;
 float cameraAngle = 0;
 int width = 1200;
 int height = 600;
-int speed = 4;
+float speed = 5, minSpeed = 0, maxSpeed = 50;
 int skyX = -18000;
 int skyY = -17000;
 int skyZ = -18000;
@@ -63,7 +63,7 @@ bool objectReverse = false;
 
 float total_moving_angle = 0.0;
 
-float x = 0.0f, y = 0.0f, z = 0.0f;
+float x = 0.0f, y = 0.0f, z = -15.0f;
 float lx = 0.0f, ly = 0.0f, lz = -1.0f;
 
 
@@ -71,11 +71,11 @@ float lx = 0.0f, ly = 0.0f, lz = -1.0f;
 void callbackKeyboard(unsigned char key, int xx, int yy) {
 	switch (key) {
 	case 'w': case 'W':
-		if (speed < 200)
+		if (speed < maxSpeed)
 			speed += (1);
 		break;
 	case 's': case 'S':
-		if (speed > -200)
+		if (speed > minSpeed)
 			speed -= (1);
 		break;
 	case 'g': case 'G':
@@ -83,7 +83,7 @@ void callbackKeyboard(unsigned char key, int xx, int yy) {
 		speed = 0;
 		break;
 	case ' ':
-		speed = (0);
+		speed = minSpeed;
 		break;
 	}
 }

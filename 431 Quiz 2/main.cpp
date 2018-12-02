@@ -54,7 +54,7 @@ std::clock_t start;
 int timer = 0;
 float particleTimer = 0;
 
-//bool won;
+int remaining = 10;
 int staticAngle, angle1, angle2;
 
 // Shadows
@@ -631,7 +631,6 @@ void display(void) {
 	glScalef(10, 10, 10);
 
 	jet->position = Vec3f(x, y, z);
-	jet->colliding = jet->checkCollision(objects[0]);
 	jet->render();
 	glPopMatrix();
 
@@ -668,9 +667,10 @@ void display(void) {
 
 	//object moving on curve
 
+	//current point on dynamic curve will be used as position for multiple objects
+	Vec3f temp = (*objectVec)[objectPosition];
 
 	glPushMatrix();
-	Vec3f temp = (*objectVec)[objectPosition];
 	glTranslatef(temp.x - 1400, temp.y, temp.z - 1500);
 	glScalef(diamondScale, diamondScale, diamondScale);
 	objects[0]->position = Vec3f(temp.x - 1400, temp.y, temp.z - 1500);
@@ -772,14 +772,37 @@ void display(void) {
 	renderBitmapString(180, window_height * .65, 0.0f, timeString.c_str(), true);
 
 	
-	if (won) {
+	for (int ii = 0; ii < objects.size(); ii++) {
+		GameObject* obj = objects[ii];
+		if (jet->checkCollision(obj)) {
+			obj->destroyed = true;
+			remaining--;
+
+			maxSpeed *= 1.15;
+			minSpeed = (minSpeed + 5) * 1.2;
+
+			if (speed > maxSpeed)
+				speed = maxSpeed;
+			else if (speed < minSpeed)
+				speed = minSpeed;
+		}
+	}
+
+	if (remaining == 0) {
 		cameraMode = true;
 		glColor3f(.1, 1, .1);
 		renderBitmapString(500, window_height * .65, 0.0f, "You Win", true);
 	}
-	else if (!inStart && !won) {
+	else {
+		string maxString = "Max Speed: " + to_string(maxSpeed);
+		string currentString = "Your Speed: " + to_string(speed);
+		string minString = "Minimum Speed: " + to_string(minSpeed);
 		glColor3f(255, 0, 255);
-		renderBitmapString(window_width - 400, window_height * .65, 0.0f, "Reach the metal surface", true);
+		renderBitmapString(window_width - 400, window_height * .8, 0.0f, "Collect all 10 diamonds", true);
+		renderBitmapString(window_width - 400, window_height * .7, 0.0f, maxString.c_str(), false);
+		renderBitmapString(window_width - 400, window_height * .6, 0.0f, currentString.c_str(), false);
+		renderBitmapString(window_width - 400, window_height * .5, 0.0f, minString.c_str(), false);
+
 	}
 
 

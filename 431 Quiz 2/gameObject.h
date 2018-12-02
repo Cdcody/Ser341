@@ -8,7 +8,7 @@ public:
 	GLuint displayList;
 	Vec3f position;
 	float scale;//scale multiplier
-	boolean colliding = false;
+	boolean destroyed = false;
 
 	GameObject(Mesh* mesh, float scale, GLuint display) {
 		displayList = display;
@@ -29,15 +29,15 @@ public:
 	}
 
 	void render() {
+		if (destroyed)
+			return;
+
 		glPushMatrix();
 		glCallList(displayList);
 
 		if (bounding) {
 			glTranslatef(modelCenter.x, modelCenter.y, modelCenter.z);
 			glDisable(GL_LIGHTING);
-			if (colliding) {
-				glColor3f(1, 0, 0);
-			}
 			gluSphere(quad, radius, 15, 15);
 			glEnable(GL_LIGHTING);
 		}
@@ -46,6 +46,9 @@ public:
 
 	//checks if 2 bounding spheres intersect
 	boolean checkCollision(GameObject* o) {
+		if (destroyed || o->destroyed)
+			return false;
+
 		float distX = (this->modelCenter.x + this->position.x) - (o->modelCenter.x + o->position.x);
 		float distY = (this->modelCenter.y + this->position.y) - (o->modelCenter.y + o->position.y);
 		float distZ = (this->modelCenter.z + this->position.z) - (o->modelCenter.z + o->position.z);
