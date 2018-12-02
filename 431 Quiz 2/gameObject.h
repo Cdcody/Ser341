@@ -10,7 +10,8 @@ public:
 	float scale;//scale multiplier
 	boolean colliding = false;
 
-	GameObject(Mesh* mesh, float scale) {
+	GameObject(Mesh* mesh, float scale, GLuint display) {
+		displayList = display;
 		this->mesh = mesh;
 		modelCenter = findCenter(mesh);
 		radius = findRadius(mesh, modelCenter);

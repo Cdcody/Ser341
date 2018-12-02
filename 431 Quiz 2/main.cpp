@@ -41,9 +41,9 @@ GLUnurbsObj *nurbsflag;
 
 
  // global
-Mesh *floorPlane, *floorPlane2, *cubeMesh, *skybox, *terrainMesh, *f16;
+Mesh *floorPlane, *floorPlane2, *cubeMesh, *skybox, *terrainMesh, *f16, *gem;
 GLuint brickFloor, metalFloor, metalBox, woodBox, marbleBox, skyBox, grassyTerrain, f16List, fireCube,
-plainFloor, plainCube, plainTerrain, grassyFloor;
+plainFloor, plainCube, plainTerrain, grassyFloor, goldDiamond;
 GLUnurbsObj *theNurb;
 GLuint textures[10];
 
@@ -95,7 +95,10 @@ void shadowMatrix(GLfloat shadowMat[4][4], Vec3f plane_normal, GLfloat lightpos[
 	shadowMat[3][3] = dot - lightpos[3] * plane_normal[3];
 }
 
-GameObject* jet, *curveBox;
+GameObject* jet;
+int diamondScale = 15;
+
+vector<GameObject*> objects = vector<GameObject*>();
 
 
 
@@ -185,8 +188,7 @@ void init() {
 	skybox = createSkyBox(6000);
 
 	f16 = loadFile("_OBJ_files/f-16.obj");
-	jet = new GameObject(f16, 10);
-	curveBox = new GameObject(cubeMesh, 2);
+	gem = loadFile("_OBJ_files/diamond.obj");
 
 	ImprovedNoise* noise = new ImprovedNoise();
 
@@ -230,8 +232,9 @@ void init() {
 	codedTexture(textures, 3, 1); //Marble texture - noise marble. Type=1
 	loadBMP_custom(textures, "_BMP_files/cubesky.bmp", 4);
 	loadBMP_custom(textures, "_BMP_files/metal.bmp", 5);
+	loadBMP_custom(textures, "_BMP_files/gold.bmp", 7);
 	loadBMP_custom(textures, "_BMP_files/grass.bmp", 6);
-	codedTexture(textures, 7, 2);
+	codedTexture(textures, 8, 2);
 	
 
 
@@ -252,9 +255,16 @@ void init() {
 	skyBox = meshToDisplayList(skybox, 5, textures[4]);
 
 	f16List = meshToDisplayList(f16, 7, textures[5]);
+	goldDiamond = meshToDisplayList(gem, 10, textures[7]);
 
-	jet->displayList = f16List;
-	curveBox->displayList = woodBox;
+	jet = new GameObject(f16, 10, f16List);
+
+	for (int ii = 0; ii < 10; ii++) {
+		GameObject* o = new GameObject(gem, 4, goldDiamond);
+		objects.push_back(o);
+	}
+
+
 	
 	//glEnable(GL_DEPTH_TEST);
 	// light
@@ -530,11 +540,6 @@ void display(void) {
 		glDisable(GL_STENCIL_TEST);
 	}
 
-
-
-
-
-
 	//**********************************************************************************************camera curve begin
 	if (!cameraMode) {
 		gluLookAt(x - lx * 250, y - ly * 250, z - lz * 250, x, y, z, 0.0f, 1.0f, 0.0f);
@@ -559,7 +564,10 @@ void display(void) {
 	glPushMatrix();
 	glTranslatef(0, 100, -800);
 	glTranslatef(150 * cos(turning / 10), 0.0, 150 * sin(turning / 10));
-	imageTextures? glCallList(woodBox) : glCallList(plainCube);
+	glScalef(diamondScale, diamondScale, diamondScale);
+	objects[1]->render();
+	objects[1]->position = Vec3f(150 * cos(turning / 10), 100, 150 * sin(turning / 10) - 800);
+	//imageTextures? glCallList(woodBox) : glCallList(plainCube);
 	glPopMatrix();
 
 	// stationary box 1
@@ -623,27 +631,9 @@ void display(void) {
 	glScalef(10, 10, 10);
 
 	jet->position = Vec3f(x, y, z);
-	jet->colliding = jet->checkCollision(curveBox);
+	jet->colliding = jet->checkCollision(objects[0]);
 	jet->render();
 	glPopMatrix();
-
-	/*
-	glPushMatrix();
-	glTranslatef(x, y, z);
-	glRotatef(convertedAngle, 0, 1, 0);
-	glTranslatef(16, -62, 120);
-	glScalef(.05, .05, .05);
-	glCallList(woodBox);
-	glPopMatrix();
-	*/
-	
-	//shows jet's collision center as a small wood box
-	glPushMatrix();
-	glTranslatef(jet->position.x, jet->position.y, jet->position.z);
-	glScalef(.05, .05, .05);
-	glCallList(woodBox);
-	glPopMatrix();
-
 
 	// tree fractal
 	if (fractals) {
@@ -682,9 +672,9 @@ void display(void) {
 	glPushMatrix();
 	Vec3f temp = (*objectVec)[objectPosition];
 	glTranslatef(temp.x - 1400, temp.y, temp.z - 1500);
-	glScalef(2, 2, 2);
-	curveBox->position = Vec3f(temp.x - 1400, temp.y, temp.z - 1500);
-	curveBox->render();
+	glScalef(diamondScale, diamondScale, diamondScale);
+	objects[0]->position = Vec3f(temp.x - 1400, temp.y, temp.z - 1500);
+	objects[0]->render();
 	//imageTextures ? glCallList(woodBox) : glCallList(plainCube);
 	glPopMatrix();
 
