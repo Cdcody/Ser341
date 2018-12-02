@@ -64,7 +64,7 @@ std::clock_t start;
 int timer = 0;
 float particleTimer = 0;
 
-int remaining = 10;
+int remaining = 8;
 int staticAngle, angle1, angle2;
 
 // Shadows
@@ -269,7 +269,7 @@ void init() {
 
 	jet = new GameObject(f16, 10, f16List);
 
-	for (int ii = 0; ii < 10; ii++) {
+	for (int ii = 0; ii < 8; ii++) {
 		GameObject* o = new GameObject(gem, 4, goldDiamond);
 		objects.push_back(o);
 	}
@@ -612,6 +612,44 @@ void display(void) {
 	objects[2]->position = Vec3f(1500 * cos(turning / 10) + 800, 500, 1500 * sin(turning / 10) - 800);
 	glPopMatrix();
 
+	glPushMatrix();
+	glTranslatef(-2000, 1500 * cos(turning / 10) + 800, 1500 * sin(turning / 10) - 800);
+	glScalef(diamondScale, diamondScale, diamondScale);
+	objects[3]->render();
+	objects[3]->position = Vec3f(-2000, 1500 * cos(turning / 10) + 800, 1500 * sin(turning / 10) - 800);
+	glPopMatrix();
+
+
+	glPushMatrix();
+	glTranslatef(1000 * cos(turning / 10) - 3000, 500, 1500 * sin(turning / 10) + 400);
+	glScalef(diamondScale, diamondScale, diamondScale);
+	objects[4]->render();
+	objects[4]->position = Vec3f(1000 * cos(turning / 10) - 3000, 500, 1500 * sin(turning / 10) + 400);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0, 2000, 600);
+	glScalef(diamondScale, diamondScale, diamondScale);
+	objects[5]->render();
+	objects[5]->position = Vec3f(0, 2000, 600);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(temp.x * 1.1 + 5000, temp.y, temp.z * 1.1 - 4000);
+	glScalef(diamondScale, diamondScale, diamondScale);
+	objects[6]->position = Vec3f(temp.x - 1400, temp.y, temp.z - 1500);
+	objects[6]->render();
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(1000 * cos(turning / 10) - 3000, 500, 1500 * sin(turning / 10) + 400);
+	glScalef(diamondScale, diamondScale, diamondScale);
+	objects[7]->render();
+	objects[7]->position = Vec3f(1000 * cos(turning / 10) - 3000, 500, 1500 * sin(turning / 10) + 400);
+	glPopMatrix();
+
+
+
 	/*
 	// stationary box 1
 	glPushMatrix();
@@ -825,8 +863,8 @@ void display(void) {
 				obj->destroyed = true;
 				remaining--;
 
-				maxSpeed *= 1.15;
-				minSpeed = (minSpeed + 5) * 1.2;
+				maxSpeed *= 1.25;
+				minSpeed = (minSpeed + 5) * 1.3;
 
 				if (speed > maxSpeed)
 					speed = maxSpeed;
@@ -847,7 +885,7 @@ void display(void) {
 		string currentString = "Your Speed: " + to_string(speed);
 		string minString = "Minimum Speed: " + to_string(minSpeed);
 		glColor3f(255, 0, 255);
-		renderBitmapString(window_width - 400, window_height * .8, 0.0f, "Collect all 10 diamonds", true);
+		renderBitmapString(window_width - 400, window_height * .8, 0.0f, "Collect all 8 diamonds", true);
 		renderBitmapString(window_width - 400, window_height * .7, 0.0f, maxString.c_str(), false);
 		renderBitmapString(window_width - 400, window_height * .6, 0.0f, currentString.c_str(), false);
 		renderBitmapString(window_width - 400, window_height * .5, 0.0f, minString.c_str(), false);

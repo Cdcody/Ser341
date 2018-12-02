@@ -17,7 +17,7 @@ float y_angle = 0.0;
 float cameraAngle = 0;
 int width = 1200;
 int height = 600;
-int speed = 5, minSpeed = 0, maxSpeed = 50;
+int speed = 5, minSpeed = 0, maxSpeed = 75;
 int skyX = -18000;
 int skyY = -17000;
 int skyZ = -18000;
@@ -112,6 +112,14 @@ void callbackKeyboard(unsigned char key, int xx, int yy) {
 			speed = minSpeed;
 		else
 			speed = temp;
+		break;
+		case 'a': case 'A':
+		cameraAngle -= 0.04f * clockSpeed;
+		orientMe(cameraAngle);
+		break;
+		case 'd': case 'D':
+		cameraAngle += 0.04f * clockSpeed;
+		orientMe(cameraAngle);
 		break;
 	case 'g': case 'G':
 		spectatorMode = !spectatorMode;
