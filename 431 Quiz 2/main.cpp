@@ -586,6 +586,21 @@ void display(void) {
 	placeObstacle(-4500, 100, 9300,1.5);  placeObstacle(-4500, 100, 8300, 2);  placeObstacle(-4500, 100, 7300, 3.5);  placeObstacle(-4500, 100, 6300, 2);
 	placeObstacle(-5500, 100, 8300,1);
 
+
+	// tree fractal
+	GLfloat row = 18000;
+	GLfloat column = 18000;
+	if (fractals) {
+		for (int i = 0; i < 4; i++) {
+			for (int j = 0; j < 4; j++) {
+				generateTree(row, -700, column);
+				column = column - 6000;
+			}
+			column = 18000;
+			row = row - 6000;
+		}
+	}
+
 	//draw start and ending areas
 	glPushMatrix();
 	glTranslatef(-750, -700, -900);
@@ -623,14 +638,7 @@ void display(void) {
 	jet->render();
 	glPopMatrix();
 
-	// tree fractal
-	if (fractals) {
-		glPushMatrix();
-		glTranslatef(300, 10, 300);
-		glScalef(100, 100, 100);
-		glCallList(FULLTREE);
-		glPopMatrix();
-	}
+	
 
 	//draw fire particles if enabled
 
@@ -644,10 +652,10 @@ void display(void) {
 		glTranslatef(0, jetPosition, 0);
 		glTranslatef(x + lx * 20, y + ly * 20, z + lz * 20);//translate based on plane's position
 		glRotatef(cameraAngle * -57.5, 0, 1, 0);//make flames match plane's direction
-		glTranslatef(0, -02, 0);//y was -75
-		glRotatef(jetRotateY, 1, 0, 0);
-		glRotatef(jetRotateX, 0, 0, 1);
-		glTranslatef(-2, -25, -70);//make flames originate in exhaust
+		//glTranslatef(0, -02, 0);//y was -75
+		//glRotatef(jetRotateY, 1, 0, 0);
+		//glRotatef(jetRotateX, 0, 0, 1);
+		glTranslatef(-7, 2, -40);//make flames originate in exhaust
 		glRotatef(90, 1, 0, 0);//emit flames backward
 		glScalef(.1, .1, .1);//make fire smaller
 		jetFlame->drawParticles(fireCube);

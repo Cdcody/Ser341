@@ -129,3 +129,11 @@ void CreateTreeLists(void) {
 	glPopMatrix();
 	glEndList();
 }
+
+void generateTree(GLfloat x, GLfloat y, GLfloat z) {
+	glPushMatrix();
+	glTranslatef(x, y, z);
+	glScalef(350, 350, 350);
+	glCallList(FULLTREE);
+	glPopMatrix();
+}
