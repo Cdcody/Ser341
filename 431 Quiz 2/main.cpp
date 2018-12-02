@@ -585,8 +585,8 @@ void display(void) {
 
 	placeObstacle(-1500, 100, 8300, 1);
 	placeObstacle(-2500, 100, 8300,1);
-	placeObstacle(-3500, 100, 9300,1);  placeObstacle(-3500, 100, 8300, 2);  placeObstacle(-3500, 100, 7300, 3);  placeObstacle(-3500, 100, 6300, 2);
-	placeObstacle(-4500, 100, 9300,1);  placeObstacle(-4500, 100, 8300, 2);  placeObstacle(-4500, 100, 7300, 3);  placeObstacle(-4500, 100, 6300, 2);
+	placeObstacle(-3500, 100, 9300,1);  placeObstacle(-3500, 100, 8300, 2.5);  placeObstacle(-3500, 100, 7300, 3);  placeObstacle(-3500, 100, 6300, 2);
+	placeObstacle(-4500, 100, 9300,1.5);  placeObstacle(-4500, 100, 8300, 2);  placeObstacle(-4500, 100, 7300, 3.5);  placeObstacle(-4500, 100, 6300, 2);
 	placeObstacle(-5500, 100, 8300,1);
 
 	//draw start and ending areas
@@ -648,7 +648,7 @@ void display(void) {
 	// tree fractal
 	if (fractals) {
 		glPushMatrix();
-		glTranslatef(300, 100, 300);
+		glTranslatef(300, 10, 300);
 		glScalef(100, 100, 100);
 		glCallList(FULLTREE);
 		glPopMatrix();
