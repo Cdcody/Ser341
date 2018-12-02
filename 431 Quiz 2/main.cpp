@@ -435,17 +435,6 @@ void display(void) {
 	glDisable(GL_FOG);
 	orientMe(cameraAngle);
 
-	//resets clock when in starting area
-	bool inStart = (x < 50 && x > -50) && (z < 50 && z > -50);
-
-	if (inStart) {
-		start = std::clock();
-	}
-	bool inFinish = (z < 9500 && z > 8000) && (x < -3500 && x > -5000);
-	if (inFinish) {
-		won = true;
-	}
-
 	// configuration
 	if (shading) {
 		glShadeModel(GL_FLAT);
@@ -771,24 +760,27 @@ void display(void) {
 	renderBitmapString(10, window_height * .65, 0.0f, "Time elapsed: ", true);
 	renderBitmapString(180, window_height * .65, 0.0f, timeString.c_str(), true);
 
-	
-	for (int ii = 0; ii < objects.size(); ii++) {
-		GameObject* obj = objects[ii];
-		if (jet->checkCollision(obj)) {
-			obj->destroyed = true;
-			remaining--;
+	//check to see if plane has touched any diamonds
+	if (collision) {
+		for (int ii = 0; ii < objects.size(); ii++) {
+			GameObject* obj = objects[ii];
+			if (jet->checkCollision(obj)) {
+				obj->destroyed = true;
+				remaining--;
 
-			maxSpeed *= 1.15;
-			minSpeed = (minSpeed + 5) * 1.2;
+				maxSpeed *= 1.15;
+				minSpeed = (minSpeed + 5) * 1.2;
 
-			if (speed > maxSpeed)
-				speed = maxSpeed;
-			else if (speed < minSpeed)
-				speed = minSpeed;
+				if (speed > maxSpeed)
+					speed = maxSpeed;
+				else if (speed < minSpeed)
+					speed = minSpeed;
+			}
 		}
 	}
+	won = remaining == 0;
 
-	if (remaining == 0) {
+	if (won) {
 		cameraMode = true;
 		glColor3f(.1, 1, .1);
 		renderBitmapString(500, window_height * .65, 0.0f, "You Win", true);

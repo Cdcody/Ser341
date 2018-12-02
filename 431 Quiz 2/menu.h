@@ -191,7 +191,7 @@ void createMenus() {
 	glutAddMenuEntry("slow", 1);
 	glutAddMenuEntry("normal", 2);
 	glutAddMenuEntry("fast", 3);
-	glutAddMenuEntry("seizure", 4);
+	glutAddMenuEntry("extreme", 4);
 
 	int shadingMenu = glutCreateMenu(shadingListener);
 	glutAddMenuEntry("smooth", 1);
