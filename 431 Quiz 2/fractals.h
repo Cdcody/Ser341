@@ -1,5 +1,5 @@
 #include <vector>
-#include "Imath/imathvec.h"
+#include <imathvec.h>
 #include "GL/glut.h"
 #include<string>
 #include<fstream>
@@ -121,11 +121,19 @@ void CreateTreeLists(void) {
 	//
 	glNewList(FULLTREE, GL_COMPILE);
 	glPushMatrix();
-	glPushAttrib(GL_LIGHTING_BIT);
+	//glPushAttrib(GL_LIGHTING_BIT);
 	glCallList(TREE_MAT);
 	glTranslatef(0, -1, 0);
-	FractalTree(0);
+	FractalTree(1);
 	glPopAttrib();
 	glPopMatrix();
 	glEndList();
+}
+
+void generateTree(GLfloat x, GLfloat y, GLfloat z) {
+	glPushMatrix();
+	glTranslatef(x, y, z);
+	glScalef(350, 350, 350);
+	glCallList(FULLTREE);
+	glPopMatrix();
 }
