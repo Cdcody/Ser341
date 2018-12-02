@@ -37,6 +37,16 @@ GLfloat ctlpoints[V_NUMPOINTS][U_NUMPOINTS][3] = {
 	{ { 0., 1., 0. },{ 1., 1., 0. },{ 2., 1., 0 },{ 3., 1., 0. } },
 	{ { 0., 0., 0. },{ 1., 0., 0. },{ 2., 0., 0 },{ 3., 0., 0. } }
 };
+
+GLfloat texpoints[2][2][2] =
+{
+{ { 1.0f, 0.0f }, { 1.0f, 1.0f } },
+{ { 0.0f, 0.0f }, { 0.0f, 1.0f } }
+};
+
+GLfloat textureknots[4] = { 0.0, 0.0, 1.0, 1.0 }; // Texture in knots
+
+
 GLUnurbsObj *nurbsflag;
 
 
@@ -318,27 +328,6 @@ void init() {
 	glClearStencil(0); //define the value to use as clean.
 }
 
-
-// draw_control_graph
-void draw_control_graph(GLfloat cpoints[V_NUMPOINTS][U_NUMPOINTS][3]) {
-	int s, t;
-	glDisable(GL_LIGHTING);
-	glColor3f(0, 0, 1);
-	glBegin(GL_LINES);
-	for (s = 0; s < V_NUMPOINTS; s++)
-		for (t = 0; t < U_NUMPOINTS - 1; t++) {
-			glVertex3fv(cpoints[s][t]);
-			glVertex3fv(cpoints[s][t + 1]);
-		}
-	for (t = 0; t < U_NUMPOINTS; t++)
-		for (s = 0; s < V_NUMPOINTS - 1; s++) {
-			glVertex3fv(cpoints[s][t]);
-			glVertex3fv(cpoints[s + 1][t]);
-		}
-	glEnd();
-	glEnable(GL_LIGHTING);
-}
-
 void reshape(int w, int h) {
 	window_width = w;
 	window_height = h;
@@ -346,7 +335,7 @@ void reshape(int w, int h) {
 	window_ratio = 1.0f * w / h;
 }
 
-void drawNurb() {
+void drawMountain() {
 	theNurb = gluNewNurbsRenderer();
 	gluNurbsProperty(theNurb, GLU_SAMPLING_TOLERANCE, 200);
 	gluNurbsProperty(theNurb, GLU_DISPLAY_MODE, GLU_FILL);
@@ -389,8 +378,12 @@ void drawNurb() {
 	glPopMatrix();
 }
 
-// draw_nurb
-void draw_nurb() {
+void drawFlag() {
+	nurbsflag = gluNewNurbsRenderer();
+	gluNurbsProperty(nurbsflag, GLU_SAMPLING_TOLERANCE, 25.0f);
+	gluNurbsProperty(nurbsflag, GLU_DISPLAY_MODE, GLU_FILL);
+	gluNurbsProperty(nurbsflag, GLU_CULLING, true);
+
 	static GLfloat angle = 0.0;
 	int i, j;
 	// wave the flag by rotating Z coords though a sine wave
@@ -398,24 +391,48 @@ void draw_nurb() {
 		for (j = 0; j < 4; j++)
 			ctlpoints[i][j][2] = sin((GLfloat)i + angle);
 	angle += 0.1;
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glBindTexture(GL_TEXTURE_2D, textures[3]);
+
 	glPushMatrix();
 	glTranslatef(2.5, -1.0, 0.0);
 	glScalef(1.5, 1.0, 1.0);
 	glRotatef(90, 0., 0., 1.);
-	gluBeginSurface(nurbsflag);
-	gluNurbsSurface(nurbsflag, V_NUMKNOTS, sknots, U_NUMKNOTS, tknots,
-		3 * U_NUMPOINTS, 3,
-		&ctlpoints[0][0][0], 4, 4, GL_MAP2_VERTEX_3);
-	gluEndSurface(nurbsflag);
 
-	draw_control_graph(ctlpoints);
+	gluBeginSurface(nurbsflag);
+
+	gluNurbsSurface(nurbsflag,
+		V_NUMKNOTS, sknots,
+		U_NUMKNOTS, tknots,
+		3 * U_NUMPOINTS,
+		3,
+		&ctlpoints[0][0][0],
+		4, 4,
+		GL_MAP2_VERTEX_3);
+
+
+	gluNurbsSurface(nurbsflag,
+		4, textureknots,
+		4, textureknots,
+		2 * 2,
+		2,
+		&texpoints[0][0][0],
+		2, 2,
+		GL_MAP2_TEXTURE_COORD_2); 
+	/*gluNurbsSurface(nurbsflag,
+		2, textureknots,
+		2, textureknots,
+		2 * U_NUMPOINTS, // u stride=#control points in v direction X size of data
+		2, //v stride
+		&texpoints[0][0][0], //control points
+		2, 2, // order of u nurbs and v nurbs
+		GL_MAP2_TEXTURE_COORD_2);*/
+		
+	gluEndSurface(nurbsflag);
 	glPopMatrix();
 }
-
-
-
-
 
 // display
 void display(void) {
@@ -557,6 +574,13 @@ void display(void) {
 	glPopMatrix();
 
 
+	glPushMatrix();
+	glTranslatef(-150, -400, 0);
+	glRotatef(-90, 0, 1, 0);
+	glScalef(50, 50, 50);
+	drawFlag();
+	glPopMatrix();
+
 	//current point on dynamic curve will be used as position for multiple objects
 	Vec3f temp = (*objectVec)[objectPosition];
 	
@@ -614,12 +638,12 @@ void display(void) {
 	/*
 	placeObstacle(-1500, 100, 8300, 1);
 	placeObstacle(-2500, 100, 8300,1);
-	placeObstacle(-3500, 100, 9300,1);  placeObstacle(-3500, 100, 8300, 2.5);  placeObstacle(-3500, 100, 7300, 3);  placeObstacle(-3500, 100, 6300, 2);
-	placeObstacle(-4500, 100, 9300,1.5);  placeObstacle(-4500, 100, 8300, 2);  placeObstacle(-4500, 100, 7300, 3.5);  placeObstacle(-4500, 100, 6300, 2);
+	placeObstacle(-3500, 100, 9300,1);  placeObstacle(-3500, 100, 8300, 2);  placeObstacle(-3500, 100, 7300, 3);  placeObstacle(-3500, 100, 6300, 2);
+	placeObstacle(-4500, 100, 9300,1);  placeObstacle(-4500, 100, 8300, 2);  placeObstacle(-4500, 100, 7300, 3);  placeObstacle(-4500, 100, 6300, 2);
 	placeObstacle(-5500, 100, 8300,1);
 	*/
 
-
+	
 	// tree fractal
 	GLfloat row = 18000;
 	GLfloat column = 18000;
@@ -634,6 +658,7 @@ void display(void) {
 		}
 	}
 
+	/*
 	//draw start and ending areas
 	glPushMatrix();
 	glTranslatef(-750, -700, -900);
@@ -650,7 +675,7 @@ void display(void) {
 		chromemat();
 	imageTextures ? glCallList(metalFloor) : glCallList(plainFloor);
 	glPopMatrix();
-
+	*/
 
 	//draws airplane and its bounding box
 	if (materials)
@@ -671,7 +696,7 @@ void display(void) {
 	jet->render();
 	glPopMatrix();
 
-	
+
 
 	//draw fire particles if enabled
 
@@ -681,6 +706,7 @@ void display(void) {
 		jetFlame->remove();
 
 
+		defaultmat();
 		glPushMatrix();
 		glTranslatef(0, jetPosition, 0);
 		glTranslatef(x + lx * 20, y + ly * 20, z + lz * 20);//translate based on plane's position
@@ -690,7 +716,7 @@ void display(void) {
 		//glRotatef(jetRotateX, 0, 0, 1);
 		glTranslatef(-7, 2, -40);//make flames originate in exhaust
 		glRotatef(90, 1, 0, 0);//emit flames backward
-		glScalef(.1, .1, .1);//make fire smaller
+		glScalef(.18, .18, .18);//make fire smaller
 		jetFlame->drawParticles(fireCube);
 		glPopMatrix();
 	}
@@ -703,7 +729,7 @@ void display(void) {
 	glPushMatrix();
 	glTranslatef(-300, -1300, -3000);
 	glScalef(40, 40, 40);
-	drawNurb();
+	drawMountain();
 	glPopMatrix();
 
 	defaultmat();

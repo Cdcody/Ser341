@@ -73,18 +73,18 @@ void callbackKeyboard(unsigned char key, int xx, int yy) {
 	if (spectatorMode) {
 		switch (key) {
 		case 'w': case 'W':
-			spectatorX += 10 * sin(spectatorAngle);
-			spectatorZ += 10 * -cos(spectatorAngle);
+			spectatorX += 80 * sin(spectatorAngle);
+			spectatorZ += 80 * -cos(spectatorAngle);
 			break;
 		case 's': case 'S':
-			spectatorZ -= 10 * sin(spectatorAngle);
-			spectatorZ -= 10 * -cos(spectatorAngle);
+			spectatorX -= 80 * sin(spectatorAngle);
+			spectatorZ -= 80 * -cos(spectatorAngle);
 			break;
 		case 'a': case 'A':
-			spectatorAngle -= .05;
+			spectatorAngle -= .08;
 			break;
 		case 'd': case 'D':
-			spectatorAngle += .05;
+			spectatorAngle += .08;
 			break;
 		case 'g': case 'G':
 			spectatorMode = !spectatorMode;
@@ -176,7 +176,8 @@ void motion(int x, int y) {
 }
 
 void mySpecial(int key, int x, int y) {
-
+	if (spectatorMode)
+		return;
 	switch (key) {
 
 	case GLUT_KEY_UP:
