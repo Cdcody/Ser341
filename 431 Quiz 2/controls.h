@@ -21,7 +21,7 @@ float y_angle = 0.0;
 float cameraAngle = 0;
 int width = 1200;
 int height = 600;
-int speed = 2;
+int speed = 5, minSpeed = 0, maxSpeed = 50;
 int skyX = -18000;
 int skyY = -17000;
 int skyZ = -18000;
@@ -63,27 +63,30 @@ bool objectReverse = false;
 
 float total_moving_angle = 0.0;
 
-float x = 0.0f, y = 0.0f, z = 0.0f;
+double x = 30.0f, y = 0.0f, z = -45.0f;
 float lx = 0.0f, ly = 0.0f, lz = -1.0f;
 
 
 // callback function for keyboard (alfanumeric keys)
 void callbackKeyboard(unsigned char key, int xx, int yy) {
+	int temp = 0;
 	switch (key) {
 	case 'w': case 'W':
-		if (speed < 200)
-			speed += (1);
+		temp = (speed + 1) * 1.15;
+		if (temp < maxSpeed)
+			speed = temp;
 		break;
 	case 's': case 'S':
-		if (speed > -200)
-			speed -= (1);
+		temp = (speed -1 )* .85;
+		if (temp < maxSpeed)
+			speed = temp;
 		break;
 	case 'g': case 'G':
 		cameraMode = true;
 		speed = 0;
 		break;
 	case ' ':
-		speed = (0);
+		speed = minSpeed;
 		break;
 	}
 }
@@ -105,8 +108,10 @@ void moveMeFlat(int i) {
 	//skyX = newSkyX;
 	//skyZ = newSkyZ;
 	x = newX;
-	y = newY;
 	z = newZ;
+
+	if(newY > 31)
+		y = newY;
 }
 
 void mouse(int button, int state, int x, int y) {
@@ -171,9 +176,9 @@ void myIdle() {
 	skyX = x - 18000;
 	skyY = y - 18000;
 	skyZ = z - 18000;
-	moveMeFlat(speed * clockSpeed);
+	moveMeFlat(speed);
 
-	turning += .1 * clockSpeed;
+	turning += .1;
 	int boxTurn = 1;
 	//box curve
 	if (boxTurn == 1) {
@@ -213,14 +218,20 @@ void myIdle() {
 
 	
 	if (!objectReverse) {
-		objectPosition++;
+		objectPosition += clockSpeed;
 
-		objectReverse = (objectPosition == 999);
+		if (objectPosition >= 999) {
+			objectPosition = 999;
+			objectReverse = true;
+		}
 	}
 	else {
-		objectPosition--;
+		objectPosition -= clockSpeed;
 
-		objectReverse = (!objectPosition == 0);
+		if (objectPosition <= 0) {
+			objectPosition = 0;
+			objectReverse = false;
+		}
 	}
 
 	if (cameraMode) {
