@@ -462,6 +462,7 @@ void display(void) {
 		glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
 	}
 	// Draw floor using blending to blend in reflection
+	/*
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glColor4f(1.0, 1.0, 1.0, 0.3);
@@ -469,7 +470,7 @@ void display(void) {
 	glDisable(GL_LIGHTING);
 	glPushMatrix();
 
-	glTranslatef(-12000, (multiscaleTerrain ? 300 : -1000), -12000);
+	glTranslatef(-12000, 0, -12000);
 	glScalef(200, 1200, 200);
 	if (materials) {
 		emeraldmat();
@@ -497,6 +498,7 @@ void display(void) {
 	glEnable(GL_LIGHTING);
 	glPopMatrix();
 	glDisable(GL_BLEND);
+	*/
 	// Shadows
 
 	if (renderShadow) {
@@ -541,12 +543,6 @@ void display(void) {
 	// draw the light arrow	
 	drawLightArrow();
 	glPopMatrix();
-
-
-
-	
-	
-
 	glDisable(GL_FOG);
 	orientMe(cameraAngle);
 

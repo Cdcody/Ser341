@@ -10,7 +10,7 @@ GLfloat shadow_matrix[4][4];
 Vec3f floor_normal;
 vector<Vec3f> dot_vertex_floor;
 float lightAngle = 0.0, lightHeight = 2000;
-int renderShadow = 1;
+int renderShadow =0;
 
 // calculate floor normal
 void calculate_floor_normal(Vec3f *plane, vector<Vec3f> dot_floor) {
