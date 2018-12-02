@@ -411,7 +411,6 @@ void draw_nurb() {
 
 	draw_control_graph(ctlpoints);
 	glPopMatrix();
-	glutSwapBuffers();
 }
 
 
@@ -424,7 +423,7 @@ void display(void) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	// light source position
 	light_position[0] = 500 * cos(lightAngle);
-	light_position[1] = lightHeight;
+	light_position[1] = 1500;
 	light_position[2] = 500 * sin(lightAngle);
 	light_position[3] = 0.0; // directional light
 	lightAngle += 0.0005;
@@ -530,16 +529,24 @@ void display(void) {
 	}
 
 	//**********************************************************************************************camera curve begin
-	if (!cameraMode) {
-		gluLookAt(x - lx * 250, y - ly * 250, z - lz * 250, x, y, z, 0.0f, 1.0f, 0.0f);
-		glPushMatrix();
-		glTranslatef(x, y, z);
-	}
-	else {
+	if(cameraMode) {
 		gluLookAt(cameraX, cameraY, cameraZ, x, y, z, 0.0f, 1.0f, 0.0f);
 		glPushMatrix();
 		glTranslatef(cameraX, cameraY, cameraZ);
 	}
+	else if (spectatorMode) {
+		gluLookAt(spectatorX, spectatorY, spectatorZ,
+			spectatorX + sin(spectatorAngle) + .001, spectatorY, spectatorZ - cos(spectatorAngle) + .001,
+			0.0f, 1.0f, 0.0f);
+		glPushMatrix();
+		glTranslatef(spectatorX, spectatorY, spectatorZ);
+	}
+	else {
+		gluLookAt(x - lx * 250, y - ly * 250, z - lz * 250, x, y, z, 0.0f, 1.0f, 0.0f);
+		glPushMatrix();
+		glTranslatef(x, y, z);
+	}
+
 	//using fog here to depend on camera
 	if (fog) {
 		glEnable(GL_FOG);
@@ -548,6 +555,13 @@ void display(void) {
 		glDisable(GL_FOG);
 	}
 	glPopMatrix();
+
+
+	//current point on dynamic curve will be used as position for multiple objects
+	Vec3f temp = (*objectVec)[objectPosition];
+	
+	if (materials)
+		goldmat();
 
 	// static rotation
 	glPushMatrix();
@@ -559,6 +573,22 @@ void display(void) {
 	//imageTextures? glCallList(woodBox) : glCallList(plainCube);
 	glPopMatrix();
 
+	glPushMatrix();
+	glTranslatef(temp.x - 1400, temp.y, temp.z - 1500);
+	glScalef(diamondScale, diamondScale, diamondScale);
+	objects[0]->position = Vec3f(temp.x - 1400, temp.y, temp.z - 1500);
+	objects[0]->render();
+	glPopMatrix();
+
+
+	glPushMatrix();
+	glTranslatef(1500 * cos(turning / 10) + 800, 500, 1500 * sin(turning / 10) - 800);
+	glScalef(diamondScale, diamondScale, diamondScale);
+	objects[2]->render();
+	objects[2]->position = Vec3f(1500 * cos(turning / 10) + 800, 500, 1500 * sin(turning / 10) - 800);
+	glPopMatrix();
+
+	/*
 	// stationary box 1
 	glPushMatrix();
 		glTranslatef(boxX, boxY, boxZ);
@@ -579,12 +609,15 @@ void display(void) {
 			glPopMatrix();
 		glPopMatrix();
 	glPopMatrix();
+	*/
 
+	/*
 	placeObstacle(-1500, 100, 8300, 1);
 	placeObstacle(-2500, 100, 8300,1);
 	placeObstacle(-3500, 100, 9300,1);  placeObstacle(-3500, 100, 8300, 2);  placeObstacle(-3500, 100, 7300, 3);  placeObstacle(-3500, 100, 6300, 2);
 	placeObstacle(-4500, 100, 9300,1);  placeObstacle(-4500, 100, 8300, 2);  placeObstacle(-4500, 100, 7300, 3);  placeObstacle(-4500, 100, 6300, 2);
 	placeObstacle(-5500, 100, 8300,1);
+	*/
 
 	//draw start and ending areas
 	glPushMatrix();
@@ -654,18 +687,6 @@ void display(void) {
 		glPopMatrix();
 	}
 
-	//object moving on curve
-
-	//current point on dynamic curve will be used as position for multiple objects
-	Vec3f temp = (*objectVec)[objectPosition];
-
-	glPushMatrix();
-	glTranslatef(temp.x - 1400, temp.y, temp.z - 1500);
-	glScalef(diamondScale, diamondScale, diamondScale);
-	objects[0]->position = Vec3f(temp.x - 1400, temp.y, temp.z - 1500);
-	objects[0]->render();
-	//imageTextures ? glCallList(woodBox) : glCallList(plainCube);
-	glPopMatrix();
 
 	// 3d surface
 	if(materials)
@@ -698,7 +719,7 @@ void display(void) {
 	glPushMatrix();
 	
 	glTranslatef(-12000, (multiscaleTerrain? 300 : -1000), -12000);
-	glScalef(300, 1200, 300);
+	glScalef(200, 1200, 200);
 	if (materials) {
 		emeraldmat();
 	}
@@ -746,7 +767,9 @@ void display(void) {
 	renderBitmapString(0.0, window_height - 13.0f, 0.0f, "Use [Arrows] to move in plane", false);
 	renderBitmapString(0.0, window_height - 26.0f, 0.0f, "Hold [left mouse] to look and change direction", false);
 	renderBitmapString(0.0, window_height - 39.0f, 0.0f, "Use [W and S] to speed up or slow down", false);
-	renderBitmapString(0.0, window_height - 52.0f, 0.0f, "Use [Spacebar] to stop", false);
+	renderBitmapString(0.0, window_height - 52.0f, 0.0f, "Use [Spacebar] to ascend", false);
+	renderBitmapString(0.0, window_height - 65.0f, 0.0f, "Use [Z] to descend", false);
+	renderBitmapString(0.0, window_height - 78.0f, 0.0f, "Use [G] for spectator mode", false);
 
 	//control viewport
 	glViewport(0, 0, window_width, window_height * .2);

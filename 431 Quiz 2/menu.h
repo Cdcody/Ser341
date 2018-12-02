@@ -19,6 +19,7 @@ bool fog = false;
 bool reflections = true;
 bool shadows = true;
 bool fractals = true;
+float clockSpeed = 1;
 
 
 

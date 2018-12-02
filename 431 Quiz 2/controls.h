@@ -1,12 +1,8 @@
-/**
- * SER 431
- * https://speakerdeck.com/javiergs/ser431-lecture-04
- **/
-
 #pragma once
 
 #include <math.h>
 #include <GL/glut.h>
+#include "menu.h"
 
 int window_width = 800, window_height = 800;
 float window_ratio = 1.0;
@@ -41,7 +37,6 @@ float jetPosition = 0;
 
 
 int t = 0;
-float clockSpeed = 1;
 float turning = 0;
 
 
@@ -67,27 +62,70 @@ double x = 30.0f, y = 0.0f, z = -45.0f;
 float lx = 0.0f, ly = 0.0f, lz = -1.0f;
 
 
+double spectatorX = 0, spectatorY = 400, spectatorZ = 0, spectatorAngle = 0;
+bool spectatorMode;
+
+
 // callback function for keyboard (alfanumeric keys)
 void callbackKeyboard(unsigned char key, int xx, int yy) {
-	int temp = 0;
+	double temp = 0;
+
+	if (spectatorMode) {
+		switch (key) {
+		case 'w': case 'W':
+			spectatorX += 10 * sin(spectatorAngle);
+			spectatorZ += 10 * -cos(spectatorAngle);
+			break;
+		case 's': case 'S':
+			spectatorZ -= 10 * sin(spectatorAngle);
+			spectatorZ -= 10 * -cos(spectatorAngle);
+			break;
+		case 'a': case 'A':
+			spectatorAngle -= .05;
+			break;
+		case 'd': case 'D':
+			spectatorAngle += .05;
+			break;
+		case 'g': case 'G':
+			spectatorMode = !spectatorMode;
+			speed = minSpeed;
+			break;
+		case ' ':
+			spectatorY += 10;
+			break;
+		case 'z': case 'Z':
+			spectatorY -= 10;
+		}
+		return;
+	}
 	switch (key) {
 	case 'w': case 'W':
 		temp = (speed + 1) * 1.15;
-		if (temp < maxSpeed)
+		if (temp > maxSpeed)
+			speed = maxSpeed;
+		else
 			speed = temp;
 		break;
 	case 's': case 'S':
 		temp = (speed -1 )* .85;
-		if (temp < maxSpeed)
+		if (temp < minSpeed)
+			speed = minSpeed;
+		else
 			speed = temp;
 		break;
 	case 'g': case 'G':
-		cameraMode = true;
-		speed = 0;
-		break;
-	case ' ':
+		spectatorMode = !spectatorMode;
 		speed = minSpeed;
 		break;
+	case ' ':
+		y += speed / 3;
+		break;
+	case 'z': case 'Z':
+		temp = y - speed / 3;
+		if (temp > 31 || !collision)
+			y = temp;
+		else
+			y = 31;
 	}
 }
 
@@ -165,18 +203,23 @@ void mySpecial(int key, int x, int y) {
 		orientMe(cameraAngle);
 
 		break;
-
-
 	}
 
 	glutPostRedisplay();
 
 }
 void myIdle() {
-	skyX = x - 18000;
-	skyY = y - 18000;
-	skyZ = z - 18000;
-	moveMeFlat(speed);
+	if (spectatorMode) {
+		skyX = spectatorX - 18000;
+		skyY = spectatorY - 18000;
+		skyZ = spectatorZ - 18000;
+	}
+	else {
+		skyX = x - 18000;
+		skyY = y - 18000;
+		skyZ = z - 18000;
+		moveMeFlat(speed);
+	}
 
 	turning += .1;
 	int boxTurn = 1;
